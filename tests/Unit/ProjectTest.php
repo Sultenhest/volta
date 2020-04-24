@@ -33,6 +33,13 @@ class ProjectTest extends TestCase
         $this->assertInstanceOf(Client::class, $project->client);
     }
 
+    public function test_a_project_has_tasks()
+    {   
+        $project = factory(Project::class)->create();
+
+        $this->assertInstanceOf(Collection::class, $project->tasks);
+    }
+
     public function test_a_project_has_a_path()
     {
         $project = factory(Project::class)->create();
