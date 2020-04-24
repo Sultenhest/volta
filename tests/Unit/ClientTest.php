@@ -20,4 +20,25 @@ class ClientTest extends TestCase
 
         $this->assertInstanceOf(User::class, $client->user);
     }
+
+    public function test_a_client_has_a_path()
+    {
+        $client = factory(Client::class)->create();
+
+        $this->assertEquals(
+            $client->path(),
+            "/clients/{$client->id}"
+        );
+    }
+
+    public function test_a_client_can_be_soft_deleted()
+    {
+        $client = factory(Client::class)->create();
+
+        $client->delete();
+
+        $this->assertSoftDeleted('clients', [
+            'id' => $client->id,
+        ]);
+    }
 }
