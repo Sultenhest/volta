@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Project;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
 {
@@ -35,7 +36,9 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $project = auth()->user()->projects()->create($this->validateRequest());
+
+        return redirect($project->path());
     }
 
     /**
@@ -46,7 +49,9 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        //
+        $this->authorize('view', $project);
+
+        return view('projects.show', compact('project'));
     }
 
     /**
@@ -69,7 +74,11 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        //
+        $this->authorize('update', $project);
+
+        $project->update($this->validateRequest());
+
+        return redirect($project->path());
     }
 
     /**
@@ -80,6 +89,56 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        //
+        $this->authorize('delete', $project);
+
+        $project->delete();
+
+        return redirect('/projects');
+    }
+
+    /**
+     * Restore the specified resource from storage.
+     *
+     * @param  \App\Project  $project
+     * @return \Illuminate\Http\Response
+     */
+    public function restore(Project $project)
+    {
+        $this->authorize('restore', $project);
+
+        $project->restore();
+
+        return redirect($project->path());
+    }
+
+    /**
+     * Force delete the specified resource from storage.
+     *
+     * @param  \App\Project  $project
+     * @return \Illuminate\Http\Response
+     */
+    public function forceDelete(Project $project)
+    {
+        $this->authorize('forceDelete', $project);
+        
+        $project->forceDelete();
+
+        return redirect('/projects');
+    }
+
+    /**
+     * Validate the request.
+     *
+     * @return Illuminate\Http\Request
+     */
+    protected function validateRequest()
+    {
+        return request()->validate([
+            'client_id' => [
+                'sometimes',
+                Rule::in(auth()->user()->clients()->pluck('id'))
+            ],
+            'title' => 'required'
+        ]);
     }
 }

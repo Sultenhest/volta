@@ -37,6 +37,13 @@ class RouteServiceProvider extends ServiceProvider
             return \App\Client::find($value);
         });
 
+        Route::bind('project', function ($value) {
+            if (in_array(Route::currentRouteName(), ['projects.restore', 'projects.forcedelete'])) {
+                return \App\Project::withTrashed()->find($value);
+            }
+            return \App\Project::find($value);
+        });
+
         parent::boot();
     }
 
