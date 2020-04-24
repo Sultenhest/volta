@@ -30,7 +30,12 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Route::bind('client', function ($value) {
+            if (in_array(Route::currentRouteName(), ['clients.restore', 'clients.forcedelete'])) {
+                return \App\Client::withTrashed()->find($value);
+            }
+            return \App\Client::find($value);
+        });
 
         parent::boot();
     }

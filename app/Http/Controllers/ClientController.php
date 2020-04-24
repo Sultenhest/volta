@@ -35,7 +35,9 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $client = auth()->user()->clients()->create($this->validateRequest());
+
+        return redirect($client->path());
     }
 
     /**
@@ -46,7 +48,9 @@ class ClientController extends Controller
      */
     public function show(Client $client)
     {
-        //
+        $this->authorize('view', $client);
+
+        return view('clients.show', compact('client'));
     }
 
     /**
@@ -69,7 +73,11 @@ class ClientController extends Controller
      */
     public function update(Request $request, Client $client)
     {
-        //
+        $this->authorize('update', $client);
+
+        $client->update($this->validateRequest());
+
+        return redirect($client->path());
     }
 
     /**
@@ -80,6 +88,52 @@ class ClientController extends Controller
      */
     public function destroy(Client $client)
     {
-        //
+        $this->authorize('delete', $client);
+
+        $client->delete();
+
+        return redirect('/clients');
+    }
+
+    /**
+     * Restore the specified resource from storage.
+     *
+     * @param  \App\Client  $client
+     * @return \Illuminate\Http\Response
+     */
+    public function restore(Client $client)
+    {
+        $this->authorize('restore', $client);
+
+        $client->restore();
+
+        return redirect($client->path());
+    }
+
+    /**
+     * Force delete the specified resource from storage.
+     *
+     * @param  \App\Client  $client
+     * @return \Illuminate\Http\Response
+     */
+    public function forceDelete(Client $client)
+    {
+        $this->authorize('forceDelete', $client);
+
+        $client->forceDelete();
+
+        return redirect('/clients');
+    }
+
+    /**
+     * Validate the request.
+     *
+     * @return Illuminate\Http\Request
+     */
+    protected function validateRequest()
+    {
+        return request()->validate([
+            'name' => 'required'
+        ]);
     }
 }
