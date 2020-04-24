@@ -21,6 +21,13 @@ class ClientTest extends TestCase
         $this->assertInstanceOf(User::class, $client->user);
     }
 
+    public function test_a_client_has_projects()
+    {
+        $client = factory(Client::class)->create();
+
+        $this->assertInstanceOf(Collection::class, $client->projects);
+    }
+
     public function test_a_client_has_a_path()
     {
         $client = factory(Client::class)->create();

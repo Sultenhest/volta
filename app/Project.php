@@ -5,12 +5,12 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Client extends Model
+class Project extends Model
 {
     use SoftDeletes;
     
     protected $fillable = [
-        'name', 'description', 'vat_abbr', 'vat'
+        'client_id', 'title', 'description'
     ];
 
     public function user()
@@ -18,13 +18,13 @@ class Client extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function projects()
+    public function client()
     {
-        return $this->hasMany(Project::class)->latest('updated_at');
+        return $this->belongsTo(Client::class);
     }
 
     public function path()
     {
-        return "/clients/{$this->id}";
+        return "/projects/{$this->id}";
     }
 }

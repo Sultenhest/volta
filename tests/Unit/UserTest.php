@@ -20,4 +20,11 @@ class UserTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $user->clients);
     }
+
+    public function test_a_user_has_projects()
+    {
+        $user = $this->signIn();
+
+        $this->assertInstanceOf(Collection::class, $user->projects);
+    }
 }
