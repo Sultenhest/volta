@@ -29,18 +29,17 @@ Route::group(['middleware' => 'auth'], function () {
     Route::patch('/clients/{client}/restore', 'ClientController@restore')->name('clients.restore');
     Route::delete('/clients/{client}/forcedelete', 'ClientController@forceDelete')->name('clients.forcedelete');
 
-    //Projects
-    Route::get('/projects', 'ProjectController@index');
-    Route::get('/projects/create', 'ProjectController@create');
-    Route::post('/projects', 'ProjectController@store');
-    Route::get('/projects/{project}', 'ProjectController@show');
-    Route::get('/projects/{project}/edit', 'ProjectController@edit');
-    Route::patch('/projects/{project}', 'ProjectController@update');
-    Route::delete('/projects/{project}', 'ProjectController@destroy');
-    Route::patch('/projects/{project}/restore', 'ProjectController@restore')->name('projects.restore');
-    Route::delete('/projects/{project}/forcedelete', 'ProjectController@forceDelete')->name('projects.forcedelete');
-
     Route::prefix('projects')->group(function () {
+        //Projects
+        Route::get('/', 'ProjectController@index');
+        Route::get('/create', 'ProjectController@create');
+        Route::post('/', 'ProjectController@store');
+        Route::get('/{project}', 'ProjectController@show');
+        Route::get('/{project}/edit', 'ProjectController@edit');
+        Route::patch('/{project}', 'ProjectController@update');
+        Route::delete('/{project}', 'ProjectController@destroy');
+        Route::patch('/{project}/restore', 'ProjectController@restore')->name('projects.restore');
+        Route::delete('/{project}/forcedelete', 'ProjectController@forceDelete')->name('projects.forcedelete');
 
         //Tasks
         Route::get('/{project}/tasks', 'TaskController@index');
