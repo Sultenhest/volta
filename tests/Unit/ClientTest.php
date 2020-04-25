@@ -48,4 +48,30 @@ class ClientTest extends TestCase
             'id' => $client->id,
         ]);
     }
+
+    public function test_a_client_can_be_restored()
+    {
+        $client = factory(Client::class)->create();
+
+        $client->delete();
+
+        $client->restore();
+
+        $this->assertDatabaseHas('clients', [
+            'id' => $client->id,
+        ]);
+    }
+
+    public function test_a_client_can_be_force_deleted()
+    {
+        $client = factory(Client::class)->create();
+
+        $client->delete();
+
+        $client->forcedelete();
+
+        $this->assertDatabaseMissing('clients', [
+            'id' => $client->id,
+        ]);
+    }
 }

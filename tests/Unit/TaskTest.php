@@ -83,8 +83,33 @@ class TaskTest extends TestCase
         $task->delete();
 
         $this->assertSoftDeleted('tasks', [
-            'id'    => $task->id,
-            'title' => $task->title
+            'id'    => $task->id
+        ]);
+    }
+
+    public function test_a_task_can_be_restored()
+    {
+        $task = factory(Task::class)->create();
+
+        $task->delete();
+
+        $task->restore();
+
+        $this->assertDatabaseHas('tasks', [
+            'id' => $task->id,
+        ]);
+    }
+
+    public function test_a_task_can_be_force_deleted()
+    {
+        $task = factory(Task::class)->create();
+
+        $task->delete();
+
+        $task->forcedelete();
+
+        $this->assertDatabaseMissing('tasks', [
+            'id' => $task->id,
         ]);
     }
 }

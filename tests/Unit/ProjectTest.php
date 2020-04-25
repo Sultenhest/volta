@@ -60,4 +60,30 @@ class ProjectTest extends TestCase
             'id' => $project->id,
         ]);
     }
+
+    public function test_a_client_can_be_restored()
+    {
+        $project = factory(Project::class)->create();
+
+        $project->delete();
+
+        $project->restore();
+
+        $this->assertDatabaseHas('projects', [
+            'id' => $project->id,
+        ]);
+    }
+
+    public function test_a_project_can_be_force_deleted()
+    {
+        $project = factory(Project::class)->create();
+
+        $project->delete();
+
+        $project->forcedelete();
+
+        $this->assertDatabaseMissing('projects', [
+            'id' => $project->id,
+        ]);
+    }
 }
