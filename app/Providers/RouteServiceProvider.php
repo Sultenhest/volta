@@ -44,6 +44,13 @@ class RouteServiceProvider extends ServiceProvider
             return \App\Project::find($value);
         });
 
+        Route::bind('task', function ($value) {
+            if (in_array(Route::currentRouteName(), ['tasks.restore', 'tasks.forcedelete'])) {
+                return \App\Task::withTrashed()->find($value);
+            }
+            return \App\Task::find($value);
+        });
+
         parent::boot();
     }
 

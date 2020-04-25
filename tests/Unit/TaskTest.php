@@ -28,7 +28,7 @@ class TaskTest extends TestCase
 
         $this->assertEquals(
             $task->path(),
-            "/tasks/{$task->id}"
+            "{$task->project->path()}/tasks/{$task->id}"
         );
     }
 

@@ -15,6 +15,8 @@ class Task extends Model
         'hours_spent', 'minutes_spent',
         'completed_at', 'billed_at'
     ];
+    
+    protected $touches = ['project'];
 
     public function project()
     {
@@ -23,7 +25,7 @@ class Task extends Model
 
     public function path()
     {
-        return "/tasks/{$this->id}";
+        return "{$this->project->path()}/tasks/{$this->id}";
     }
 
     public function complete()
