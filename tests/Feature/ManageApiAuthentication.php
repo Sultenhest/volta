@@ -15,7 +15,7 @@ class ManageApiAuthentication extends TestCase
 
     public function test_a_user_can_access_their_user_info()
     {
-        Passport::actingAs(factory(User::class)->create());
+        $this->apiSignIn();
 
         $response = $this->get('/api/user');
 
