@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class ManageClientsApiTest extends TestCase
+class ManageClientsTest extends TestCase
 {
     use WithFaker, RefreshDatabase;
 
@@ -31,20 +31,20 @@ class ManageClientsApiTest extends TestCase
 
         $attributes = factory(Client::class)->raw(['name' => '']);
 
-        $response = $this->json('POST', '/api/clients', $attributes);
+        $response = $this->postJson('/api/clients', $attributes);
 
         $response->assertStatus(422)->assertJson([
             'message' => 'The given data was invalid.'
         ]);
     }
 
-    public function test_a_user_can_create_their_client()
+    public function test_a_user_can_create_a_client()
     {
         $user = $this->apiSignIn();
 
-        $attributes = ['name' => $this->faker->sentence()];
-
-        $response = $this->postJson('/api/clients', $attributes)
+        $response = $this->postJson('/api/clients', $attributes = [
+                'name' => $this->faker->sentence()
+            ])
             ->assertCreated();
 
         $client = Client::where($attributes)->first();
@@ -59,7 +59,7 @@ class ManageClientsApiTest extends TestCase
         $user = $this->apiSignIn($client->user);
 
         $response = $this->actingAs($user)
-            ->patch($client->path(), $attributes = [
+            ->patchJson($client->path(), $attributes = [
                 'name' => 'New Name'
             ])
             ->assertOk();
@@ -76,7 +76,7 @@ class ManageClientsApiTest extends TestCase
         $client = $user->clients()->create($attributes);
 
         $response = $this->actingAs($user)
-            ->delete($client->path())
+            ->deleteJson($client->path())
             ->assertNoContent();
 
         $this->assertSoftDeleted('clients', $attributes);
@@ -93,7 +93,7 @@ class ManageClientsApiTest extends TestCase
         $client->delete();
 
         $response = $this->actingAs($user)
-            ->patch($client->path() . '/restore')
+            ->patchJson($client->path() . '/restore')
             ->assertOk();
 
         $this->assertDatabaseHas('clients', $attributes);
@@ -110,7 +110,7 @@ class ManageClientsApiTest extends TestCase
         $client->delete();
 
         $this->actingAs($user)
-            ->delete($client->path() . '/forcedelete')
+            ->deleteJson($client->path() . '/forcedelete')
             ->assertStatus(204);
 
         $this->assertDatabaseMissing('clients', $attributes);
@@ -131,7 +131,7 @@ class ManageClientsApiTest extends TestCase
 
         $client = factory(Client::class)->create();
 
-        $this->patch($client->path())->assertForbidden();
+        $this->patchJson($client->path())->assertForbidden();
     }
 
     public function test_an_authenticated_user_cannot_delete_clients_of_others()
@@ -140,7 +140,7 @@ class ManageClientsApiTest extends TestCase
 
         $client = factory(Client::class)->create();
 
-        $this->delete($client->path())->assertForbidden();
+        $this->deleteJson($client->path())->assertForbidden();
     }
 
     public function test_an_authenticated_user_cannot_restore_clients_of_others()
@@ -151,7 +151,7 @@ class ManageClientsApiTest extends TestCase
 
         $client->delete();
 
-        $this->patch($client->path() . '/restore')->assertForbidden();
+        $this->patchJson($client->path() . '/restore')->assertForbidden();
     }
 
     public function test_an_authenticated_user_cannot_force_delete_clients_of_others()
@@ -162,6 +162,6 @@ class ManageClientsApiTest extends TestCase
 
         $client->delete();
 
-        $this->delete($client->path() . '/forcedelete')->assertForbidden();
+        $this->deleteJson($client->path() . '/forcedelete')->assertForbidden();
     }
 }
