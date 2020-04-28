@@ -17,11 +17,9 @@ class ManageProjectsTest extends TestCase
     {
         $project = factory(Project::class)->create();
 
-        $this->get('/projects')->assertRedirect('login');
-        $this->get('/projects/create')->assertRedirect('login');
-        $this->post('/projects', $project->toArray())->assertRedirect('login');
+        $this->get('/api/projects')->assertRedirect('login');
+        $this->post('/api/projects', $project->toArray())->assertRedirect('login');
         $this->get($project->path())->assertRedirect('login');
-        $this->get('/projects/edit')->assertRedirect('login');
         $this->patch($project->path())->assertRedirect('login');
         $this->delete($project->path())->assertRedirect('login');
         $this->patch($project->path() . '/restore')->assertRedirect('login');
@@ -30,61 +28,61 @@ class ManageProjectsTest extends TestCase
 
     public function test_a_project_requires_a_title()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
         $attributes = factory(Project::class)->raw(['title' => '']);
 
-        $this->post('/projects', $attributes)->assertSessionHasErrors('title');
+        $response = $this->postJson('/api/projects', $attributes);
+
+        $response->assertStatus(422)->assertJson([
+            'message' => 'The given data was invalid.'
+        ]);
     }
 
     public function test_a_user_can_create_a_project()
     {
-        $this->signIn();
+        $user = $this->apiSignIn();
 
-        $this->get('/projects/create')->assertOk();
-
-        $attributes = ['title' => $this->faker->sentence()];
-
-        $response = $this->post('/projects', $attributes);
-
-        $project = Project::where($attributes)->first();
-
-        $response->assertRedirect($project->path());
-
-        $this->get($project->path())->assertSee($attributes['title']);
-    }
-
-    public function test_a_user_can_update_a_project()
-    {
-        $project = factory(Project::class)->create();
-
-        $this->actingAs($project->user)
-            ->patch($project->path(), $attributes = [
-                'title' => 'New Title'
-            ])
-            ->assertRedirect($project->path());
+        $response = $this->postJson('/api/projects', $attributes = [
+                'title' => $this->faker->sentence()
+            ])->assertCreated();
 
         $this->assertDatabaseHas('projects', $attributes);
     }
 
-    public function test_a_user_can_soft_delete_a_project()
+    public function test_a_user_can_update_their_project()
     {
-        $user = $this->signIn();
+        $project = factory(Project::class)->create();
+
+        $user = $this->apiSignIn($project->user);
+
+        $response = $this->actingAs($user)
+            ->patchJson($project->path(), $attributes = [
+                'title' => 'New Name'
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('projects', $attributes);
+    }
+
+    public function test_a_user_can_soft_delete_their_project()
+    {
+        $user = $this->apiSignIn();
 
         $attributes = ['title' => 'Project Title'];
 
         $project = $user->projects()->create($attributes);
 
-        $this->actingAs($user)
-            ->delete($project->path())
-            ->assertRedirect('/projects');
+        $response = $this->actingAs($user)
+            ->deleteJson($project->path())
+            ->assertNoContent();
 
         $this->assertSoftDeleted('projects', $attributes);
     }
 
     public function test_a_user_can_restore_a_project()
     {
-        $user = $this->signIn();
+        $user = $this->apiSignIn();
 
         $attributes = ['title' => 'Project Title'];
 
@@ -93,15 +91,15 @@ class ManageProjectsTest extends TestCase
         $project->delete();
 
         $response = $this->actingAs($user)
-            ->patch($project->path() . '/restore')
-            ->assertRedirect($project->path());
+            ->patchJson($project->path() . '/restore')
+            ->assertOk();
 
         $this->assertDatabaseHas('projects', $attributes);
     }
 
     public function test_a_user_can_only_force_delete_a_soft_deleted_project()
     {
-        $user = $this->signIn();
+        $user = $this->apiSignIn();
 
         $attributes = ['title' => 'Project Title'];
 
@@ -110,24 +108,15 @@ class ManageProjectsTest extends TestCase
         $project->delete();
 
         $this->actingAs($user)
-            ->delete($project->path() . '/forcedelete')
-            ->assertRedirect('/projects');
+            ->deleteJson($project->path() . '/forcedelete')
+            ->assertStatus(204);
 
         $this->assertDatabaseMissing('projects', $attributes);
     }
 
-    public function test_a_user_can_view_their_project()
-    {
-        $project = factory(Project::class)->create();
-
-        $this->actingAs($project->user)
-            ->get($project->path())
-            ->assertSee($project->title);
-    }
-
     public function test_a_user_can_add_their_own_clients_to_projects()
     {
-        $user = $this->signIn();
+        $user = $this->apiSignIn();
 
         $client = $user->clients()->create(['name' => 'Test name']);
 
@@ -136,19 +125,15 @@ class ManageProjectsTest extends TestCase
             'title'     => $this->faker->sentence()
         ];
 
-        $response = $this->post('/projects', $attributes);
+        $response = $this->post('/api/projects', $attributes)
+            ->assertCreated();
 
-        $project = Project::where($attributes)->first();
-
-        $response->assertRedirect($project->path());
-
-        $this->get($project->path())->assertSee($attributes['title']);
-        $this->get($project->path())->assertSee($project->client->name);
+        $this->assertDatabaseHas('projects', $attributes);
     }
 
     public function test_a_user_cannot_add_other_users_clients_to_projects()
     {
-        $user = $this->signIn();
+        $user = $this->apiSignIn();
 
         $attributes = ['title' => 'Project Title'];
 
@@ -156,16 +141,19 @@ class ManageProjectsTest extends TestCase
 
         $client = factory(Client::class)->create();
 
-        $this->actingAs($user)
-            ->patch($project->path(), [
+        $response = $this->actingAs($user)
+            ->patchJson($project->path(), [
                 'client_id' => $client->id
-            ])
-            ->assertSessionHasErrors('client_id');
+            ]);
+
+        $response->assertStatus(422)->assertJson([
+            'message' => 'The given data was invalid.'
+        ]);
     }
 
     public function test_an_authenticated_user_cannot_see_projects_of_others()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
         $project = factory(Project::class)->create();
 
@@ -174,41 +162,41 @@ class ManageProjectsTest extends TestCase
 
     public function test_an_authenticated_user_cannot_update_projects_of_others()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
         $project = factory(Project::class)->create();
 
-        $this->patch($project->path())->assertForbidden();
+        $this->patchJson($project->path())->assertForbidden();
     }
 
     public function test_an_authenticated_user_cannot_delete_projects_of_others()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
         $project = factory(Project::class)->create();
 
-        $this->delete($project->path())->assertForbidden();
+        $this->deleteJson($project->path())->assertForbidden();
     }
 
     public function test_an_authenticated_user_cannot_restore_projects_of_others()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
         $project = factory(Project::class)->create();
 
         $project->delete();
 
-        $this->patch($project->path() . '/restore')->assertForbidden();
+        $this->patchJson($project->path() . '/restore')->assertForbidden();
     }
 
     public function test_an_authenticated_user_cannot_force_delete_projects_of_others()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
         $project = factory(Project::class)->create();
 
         $project->delete();
 
-        $this->delete($project->path() . '/forcedelete')->assertForbidden();
+        $this->deleteJson($project->path() . '/forcedelete')->assertForbidden();
     }
 }

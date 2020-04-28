@@ -46,7 +46,7 @@ class ProjectTest extends TestCase
 
         $this->assertEquals(
             $project->path(),
-            "/projects/{$project->id}"
+            "/api/projects/{$project->id}"
         );
     }
 

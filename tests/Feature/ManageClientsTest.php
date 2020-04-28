@@ -47,7 +47,7 @@ class ManageClientsTest extends TestCase
             ])
             ->assertCreated();
 
-        $client = Client::where($attributes)->first();
+        //$client = Client::where($attributes)->first();
 
         $this->assertDatabaseHas('clients', $attributes);
     }

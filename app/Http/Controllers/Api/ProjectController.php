@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Project;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -19,16 +20,6 @@ class ProjectController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -36,9 +27,9 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        $project = auth()->user()->projects()->create($this->validateRequest());
+        $project = auth()->user()->projects()->create($this->validateRequest($request));
 
-        return redirect($project->path());
+        return response()->json($project, 201);
     }
 
     /**
@@ -51,18 +42,7 @@ class ProjectController extends Controller
     {
         $this->authorize('view', $project);
 
-        return view('projects.show', compact('project'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Project  $project
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Project $project)
-    {
-        //
+        return response()->json($project);
     }
 
     /**
@@ -76,9 +56,9 @@ class ProjectController extends Controller
     {
         $this->authorize('update', $project);
 
-        $project->update($this->validateRequest());
+        $project->update($this->validateRequest($request));
 
-        return redirect($project->path());
+        return response()->json($project, 200);
     }
 
     /**
@@ -93,7 +73,7 @@ class ProjectController extends Controller
 
         $project->delete();
 
-        return redirect('/projects');
+        return response()->json(null, 204);
     }
 
     /**
@@ -108,7 +88,7 @@ class ProjectController extends Controller
 
         $project->restore();
 
-        return redirect($project->path());
+        return response()->json($project, 200);
     }
 
     /**
@@ -120,10 +100,10 @@ class ProjectController extends Controller
     public function forceDelete(Project $project)
     {
         $this->authorize('forceDelete', $project);
-        
+
         $project->forceDelete();
 
-        return redirect('/projects');
+        return response()->json(null, 204);
     }
 
     /**
@@ -131,9 +111,9 @@ class ProjectController extends Controller
      *
      * @return Illuminate\Http\Request
      */
-    protected function validateRequest()
+    protected function validateRequest(Request $request)
     {
-        return request()->validate([
+        return $request->validate([
             'client_id' => [
                 'sometimes',
                 Rule::in(auth()->user()->clients()->pluck('id'))

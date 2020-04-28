@@ -23,7 +23,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
-    Route::post('/logout', 'UserController@logout');
+    Route::post('/logout', 'AuthController@logout');
 
     //Clients
     Route::get('/clients', 'ClientController@index');
@@ -33,4 +33,15 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     Route::delete('/clients/{client}', 'ClientController@destroy');
     Route::patch('/clients/{client}/restore', 'ClientController@restore')->name('clients.restore');
     Route::delete('/clients/{client}/forcedelete', 'ClientController@forceDelete')->name('clients.forcedelete');
+
+    Route::prefix('projects')->group(function () {
+        //Projects
+        Route::get('/', 'ProjectController@index');
+        Route::post('/', 'ProjectController@store');
+        Route::get('/{project}', 'ProjectController@show');
+        Route::patch('/{project}', 'ProjectController@update');
+        Route::delete('/{project}', 'ProjectController@destroy');
+        Route::patch('/{project}/restore', 'ProjectController@restore')->name('projects.restore');
+        Route::delete('/{project}/forcedelete', 'ProjectController@forceDelete')->name('projects.forcedelete');
+    });
 });

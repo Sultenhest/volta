@@ -19,6 +19,7 @@ Route::get('/', function () {
 
 Route::group(['middleware' => 'auth'], function () {
     Route::prefix('projects')->group(function () {
+        /*
         //Projects
         Route::get('/', 'ProjectController@index');
         Route::get('/create', 'ProjectController@create');
@@ -29,7 +30,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::delete('/{project}', 'ProjectController@destroy');
         Route::patch('/{project}/restore', 'ProjectController@restore')->name('projects.restore');
         Route::delete('/{project}/forcedelete', 'ProjectController@forceDelete')->name('projects.forcedelete');
-
+        */
         //Tasks
         Route::get('/{project}/tasks', 'TaskController@index');
         Route::get('/{project}/tasks/create', 'TaskController@create');
