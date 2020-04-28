@@ -26,4 +26,11 @@ class UserTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $user->projects);
     }
+
+    public function test_a_user_has_many_tasks()
+    {
+        $user = factory(User::class)->create();
+
+        $this->assertInstanceOf(Collection::class, $user->tasks);
+    }
 }
