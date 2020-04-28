@@ -47,7 +47,10 @@ class ManageClientsTest extends TestCase
         $response = $this->postJson('/api/clients', $attributes = [
                 'name' => $this->faker->sentence()
             ])
-            ->assertCreated();
+            ->assertCreated()
+            ->assertJson([
+                'message' => 'Client was successfully created.',
+            ]);
 
         $this->assertDatabaseHas('clients', $attributes);
     }
@@ -62,7 +65,10 @@ class ManageClientsTest extends TestCase
             ->patchJson($client->path(), $attributes = [
                 'name' => 'New Name'
             ])
-            ->assertOk();
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Client was successfully updated.',
+            ]);
 
         $this->assertDatabaseHas('clients', $attributes);
     }
@@ -94,7 +100,10 @@ class ManageClientsTest extends TestCase
 
         $response = $this->actingAs($user)
             ->patchJson($client->path() . '/restore')
-            ->assertOk();
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Client was successfully restored.',
+            ]);
 
         $this->assertDatabaseHas('clients', $attributes);
     }
@@ -111,7 +120,7 @@ class ManageClientsTest extends TestCase
 
         $this->actingAs($user)
             ->deleteJson($client->path() . '/forcedelete')
-            ->assertStatus(204);
+            ->assertNoContent();
 
         $this->assertDatabaseMissing('clients', $attributes);
     }

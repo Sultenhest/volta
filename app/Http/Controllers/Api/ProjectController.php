@@ -115,7 +115,7 @@ class ProjectController extends Controller
         $project->forceDelete();
 
         return response()->json([
-            'message' => 'Project was successfully created.'
+            'message' => 'Project was permanently deleted.'
         ], 204);
     }
 

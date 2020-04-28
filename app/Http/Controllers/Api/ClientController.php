@@ -28,7 +28,10 @@ class ClientController extends Controller
     {
         $client = auth()->user()->clients()->create($this->validateRequest($request));
 
-        return response()->json($client, 201);
+        return response()->json([
+            'client'  => $client,
+            'message' => 'Client was successfully created.'
+        ], 201);
     }
 
     /**
@@ -57,7 +60,10 @@ class ClientController extends Controller
 
         $client->update($this->validateRequest($request));
 
-        return response()->json($client, 200);
+        return response()->json([
+            'client'  => $client,
+            'message' => 'Client was successfully updated.'
+        ], 200);
     }
 
     /**
@@ -72,7 +78,9 @@ class ClientController extends Controller
 
         $client->delete();
 
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => 'Client was successfully trashed.'
+        ], 204);
     }
 
     /**
@@ -87,7 +95,10 @@ class ClientController extends Controller
 
         $client->restore();
 
-        return response()->json($client, 200);
+        return response()->json([
+            'client'  => $client,
+            'message' => 'Client was successfully restored.'
+        ], 200);
     }
 
     /**
@@ -102,7 +113,9 @@ class ClientController extends Controller
 
         $client->forceDelete();
 
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => 'Client was permanently deleted.'
+        ], 204);
     }
 
     /**
