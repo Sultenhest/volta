@@ -47,7 +47,11 @@ class ManageProjectsTest extends TestCase
 
         $response = $this->postJson('/api/projects', $attributes = [
                 'title' => $this->faker->sentence()
-            ])->assertCreated();
+            ])
+            ->assertCreated()
+            ->assertJson([
+                'message' => 'Project was successfully created.',
+            ]);
 
         $this->assertDatabaseHas('projects', $attributes);
     }
@@ -62,7 +66,10 @@ class ManageProjectsTest extends TestCase
             ->patchJson($project->path(), $attributes = [
                 'title' => 'New Name'
             ])
-            ->assertOk();
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Project was successfully updated.',
+            ]);
 
         $this->assertDatabaseHas('projects', $attributes);
     }
@@ -94,7 +101,10 @@ class ManageProjectsTest extends TestCase
 
         $response = $this->actingAs($user)
             ->patchJson($project->path() . '/restore')
-            ->assertOk();
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Project was successfully restored.',
+            ]);
 
         $this->assertDatabaseHas('projects', $attributes);
     }
@@ -111,7 +121,7 @@ class ManageProjectsTest extends TestCase
 
         $this->actingAs($user)
             ->deleteJson($project->path() . '/forcedelete')
-            ->assertStatus(204);
+            ->assertNoContent();
 
         $this->assertDatabaseMissing('projects', $attributes);
     }

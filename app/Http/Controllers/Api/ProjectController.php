@@ -29,7 +29,10 @@ class ProjectController extends Controller
     {
         $project = auth()->user()->projects()->create($this->validateRequest($request));
 
-        return response()->json($project, 201);
+        return response()->json([
+            'project' => $project,
+            'message' => 'Project was successfully created.'
+        ], 201);
     }
 
     /**
@@ -58,7 +61,10 @@ class ProjectController extends Controller
 
         $project->update($this->validateRequest($request));
 
-        return response()->json($project, 200);
+        return response()->json([
+            'project' => $project,
+            'message' => 'Project was successfully updated.'
+        ], 200);
     }
 
     /**
@@ -73,7 +79,9 @@ class ProjectController extends Controller
 
         $project->delete();
 
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => 'Project was successfully trashed.'
+        ], 204);
     }
 
     /**
@@ -88,7 +96,10 @@ class ProjectController extends Controller
 
         $project->restore();
 
-        return response()->json($project, 200);
+        return response()->json([
+            'project' => $project,
+            'message' => 'Project was successfully restored.'
+        ], 200);
     }
 
     /**
@@ -103,7 +114,9 @@ class ProjectController extends Controller
 
         $project->forceDelete();
 
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => 'Project was successfully created.'
+        ], 204);
     }
 
     /**
