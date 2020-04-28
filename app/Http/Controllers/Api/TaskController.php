@@ -1,31 +1,21 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Task;
 use App\Project;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class TaskController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @param  \App\Project  $project
      * @return \Illuminate\Http\Response
      */
-    public function index(Project $project)
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @param  \App\Project  $project
-     * @return \Illuminate\Http\Response
-     */
-    public function create(Project $project)
+    public function index()
     {
         //
     }
@@ -39,9 +29,9 @@ class TaskController extends Controller
      */
     public function store(Request $request, Project $project)
     {
-        $task = $project->tasks()->create($this->validateRequest());
+        $task = $project->tasks()->create($this->validateRequest($request));
 
-        return redirect($task->path());
+        return response()->json($task, 201);
     }
 
     /**
@@ -55,19 +45,7 @@ class TaskController extends Controller
     {
         $this->authorize('view', $project);
 
-        return view('tasks.show', compact('project', 'task'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Project  $project
-     * @param  \App\Task  $task
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Project $project, Task $task)
-    {
-        //
+        return response()->json($task);
     }
 
     /**
@@ -82,12 +60,15 @@ class TaskController extends Controller
     {
         $this->authorize('view', $project);
 
-        $task->update($this->validateRequest());
+        $task->update($this->validateRequest($request));
 
-        return redirect($task->path());
+        $request['completed_at'] ? $task->complete() : $task->incomplete();
+        $request['billed_at']    ? $task->billed()   : $task->unbilled();
+
+        return response()->json($task, 200);
     }
 
-    /**
+   /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Project  $project
@@ -100,7 +81,7 @@ class TaskController extends Controller
         
         $task->delete();
 
-        return redirect($project->path());
+        return response()->json(null, 204);
     }
 
     /**
@@ -116,7 +97,7 @@ class TaskController extends Controller
         
         $task->restore();
 
-        return redirect($task->path());
+        return response()->json($task, 200);
     }
 
     /**
@@ -134,23 +115,22 @@ class TaskController extends Controller
         
         $task->forceDelete();
 
-        return redirect($project->path());
+        return response()->json(null, 204);
     }
 
     /**
      * Validate the request.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return Illuminate\Http\Request
      */
-    protected function validateRequest()
+    protected function validateRequest(Request $request)
     {
-        return request()->validate([
-            /*
+        return $request->validate([
             'project_id' => [
                 'sometimes',
                 Rule::in(auth()->user()->projects()->pluck('id'))
             ],
-            */
             'title'         => 'required',
             'hours_spent'   => 'sometimes|integer|min:0',
             'minutes_spent' => 'sometimes|integer|min:0|max:59',

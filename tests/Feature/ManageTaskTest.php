@@ -18,10 +18,8 @@ class ManageTaskTest extends TestCase
         $task = factory(Task::class)->create();
 
         $this->get($task->project->path() . '/tasks')->assertRedirect('login');
-        $this->get($task->project->path() . '/tasks/create')->assertRedirect('login');
         $this->post($task->project->path() . '/tasks', $task->toArray())->assertRedirect('login');
         $this->get($task->path())->assertRedirect('login');
-        $this->get($task->path() . '/edit')->assertRedirect('login');
         $this->patch($task->path())->assertRedirect('login');
         $this->delete($task->path())->assertRedirect('login');
         $this->patch($task->path() . '/restore')->assertRedirect('login');
@@ -30,18 +28,22 @@ class ManageTaskTest extends TestCase
 
     public function test_a_task_requires_a_title()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
         $attributes = factory(Task::class)->raw(['title' => '']);
 
         $project = factory(Project::class)->create();
 
-        $this->post($project->path() . '/tasks', $attributes)->assertSessionHasErrors('title');
+        $response = $this->postJson($project->path() . '/tasks', $attributes);
+
+        $response->assertStatus(422)->assertJson([
+            'message' => 'The given data was invalid.'
+        ]);
     }
 
     public function test_a_task_hours_spent_has_to_be_atleast_0()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
         $attributes = factory(Task::class)->raw([
             'title'       => $this->faker->sentence(),
@@ -50,12 +52,16 @@ class ManageTaskTest extends TestCase
 
         $project = factory(Project::class)->create();
 
-        $this->post($project->path() . '/tasks', $attributes)->assertSessionHasErrors('hours_spent');
+        $response = $this->postJson($project->path() . '/tasks', $attributes);
+
+        $response->assertStatus(422)->assertJson([
+            'message' => 'The given data was invalid.'
+        ]);
     }
 
     public function test_a_task_minutes_spent_has_to_be_atleast_0()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
         $attributes = factory(Task::class)->raw([
             'title'         => $this->faker->sentence(),
@@ -64,12 +70,16 @@ class ManageTaskTest extends TestCase
 
         $project = factory(Project::class)->create();
 
-        $this->post($project->path() . '/tasks', $attributes)->assertSessionHasErrors('minutes_spent');
+        $response = $this->postJson($project->path() . '/tasks', $attributes);
+
+        $response->assertStatus(422)->assertJson([
+            'message' => 'The given data was invalid.'
+        ]);
     }
 
     public function test_a_task_minutes_spent_has_to_be_below_60()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
         $attributes = factory(Task::class)->raw([
             'title'         => $this->faker->sentence(),
@@ -78,131 +88,143 @@ class ManageTaskTest extends TestCase
 
         $project = factory(Project::class)->create();
 
-        $this->post($project->path() . '/tasks', $attributes)->assertSessionHasErrors('minutes_spent');
+        $response = $this->postJson($project->path() . '/tasks', $attributes);
+
+        $response->assertStatus(422)->assertJson([
+            'message' => 'The given data was invalid.'
+        ]);
     }
 
     public function test_a_user_can_add_tasks_to_their_project()
     {
-        $project = factory(Project::class)->create();
+        $user = $this->apiSignIn();
 
-        $this->actingAs($project->user)
-            ->get($project->path() . '/tasks/create')->assertOk();
+        $project = $user->projects()->create(['title' => 'Project Title']);
 
-        $attributes = ['title' => $this->faker->sentence()];
-
-        $response = $this->actingAs($project->user)
-                        ->post($project->path() . '/tasks', $attributes);
-
-        $task = Task::where($attributes)->first();
-
-        $response->assertRedirect($task->path());
-
-        $this->get($task->path())->assertSee($attributes['title']);
-    }
-
-    public function test_a_user_can_update_their_task()
-    {
-        $task = factory(Task::class)->create();
-
-        $this->actingAs($task->project->user)
-            ->patch($task->path(), $attributes = [
-                'title' => 'new title'
-            ])
-            ->assertRedirect($task->path());
+        $response = $this->postJson($project->path() . '/tasks/',
+            $attributes = [
+                'title' => $this->faker->sentence()
+            ])->assertCreated();
 
         $this->assertDatabaseHas('tasks', $attributes);
     }
 
-    public function test_a_user_can_restore_their_soft_deleted_task()
+    public function test_a_user_cannot_add_tasks_to_another_users_project()
     {
         $project = factory(Project::class)->create();
 
-        $attributes = ['title' => $this->faker->sentence()];
+        $user = $this->apiSignIn();
+
+        $response = $this->actingAs($user)
+            ->postJson($project->path() . '/tasks/', [
+                'project_id' => $project->id,
+                'title'      => 'Task Title'
+            ]);
+
+        $response->assertStatus(422)->assertJson([
+            'message' => 'The given data was invalid.'
+        ]);
+    }
+
+    public function test_a_user_can_update_their_tasks()
+    {
+        $task = factory(Task::class)->create();
+
+        $user = $this->apiSignIn($task->project->user);
+
+        $response = $this->actingAs($user)
+            ->patchJson($task->path(), $attributes = [
+                'title' => 'New title',
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('tasks', $attributes);
+    }
+
+    public function test_a_user_can_restore_their_soft_deleted_tasks()
+    {
+        $user = $this->apiSignIn();
+
+        $project = $user->projects()->create(['title' => 'project']);
+
+        $attributes = ['title' => 'Task Title'];
 
         $task = $project->tasks()->create($attributes);
 
-        $this->actingAs($project->user)
-            ->delete($task->path())
-            ->assertRedirect($project->path());
+        $task->delete();
 
-        $this->assertSoftDeleted('tasks', $attributes);
-
-        $this->actingAs($project->user)
-            ->patch($task->path() . '/restore')
-            ->assertRedirect($task->path());
+        $response = $this->actingAs($user)
+            ->patchJson($task->path() . '/restore')
+            ->assertOk();
 
         $this->assertDatabaseHas('tasks', $attributes);
     }
 
     public function test_a_user_can_only_force_delete_a_soft_deleted_task()
     {
-        $project = factory(Project::class)->create();
+        $user = $this->apiSignIn();
 
-        $attributes = ['title' => $this->faker->sentence()];
+        $project = $user->projects()->create(['title' => 'project']);
+
+        $attributes = ['title' => 'Task Title'];
 
         $task = $project->tasks()->create($attributes);
 
-        $this->actingAs($project->user)
-            ->delete($task->path() . '/forcedelete')
-            ->assertForbidden();
-
         $task->delete();
 
-        $this->assertSoftDeleted('tasks', $attributes);
-
-        $this->actingAs($project->user)
-            ->delete($task->path() . '/forcedelete')
-            ->assertRedirect($project->path());
+        $this->actingAs($user)
+            ->deleteJson($task->path() . '/forcedelete')
+            ->assertStatus(204);
 
         $this->assertDatabaseMissing('tasks', $attributes);
     }
 
     public function test_an_authenticated_user_cannot_see_tasks_of_others()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
-        $task = factory('App\Task')->create();
+        $task = factory(Task::class)->create();
 
         $this->get($task->path())->assertForbidden();
     }
 
     public function test_an_authenticated_user_cannot_update_tasks_of_others()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
-        $task = factory('App\Task')->create();
+        $task = factory(Task::class)->create();
 
-        $this->patch($task->path())->assertForbidden();
+        $this->patchJson($task->path())->assertForbidden();
     }
 
     public function test_an_authenticated_user_cannot_delete_tasks_of_others()
     {
-        $this->signIn();
+       $this->apiSignIn();
 
-        $task = factory('App\Task')->create();
+        $task = factory(Task::class)->create();
 
-        $this->delete($task->path())->assertForbidden();
+        $this->deleteJson($task->path())->assertForbidden();
     }
 
     public function test_an_authenticated_user_cannot_restore_tasks_of_others()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
-        $task = factory('App\Task')->create();
+        $task = factory(Task::class)->create();
 
         $task->delete();
 
-        $this->patch($task->path() . '/restore')->assertForbidden();
+        $this->patchJson($task->path() . '/restore')->assertForbidden();
     }
 
     public function test_an_authenticated_user_cannot_force_delete_tasks_of_others()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
-        $task = factory('App\Task')->create();
+        $task = factory(Task::class)->create();
 
         $task->delete();
 
-        $this->delete($task->path() . '/forcedelete')->assertForbidden();
+        $this->deleteJson($task->path() . '/forcedelete')->assertForbidden();
     }
 }

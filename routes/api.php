@@ -43,5 +43,14 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
         Route::delete('/{project}', 'ProjectController@destroy');
         Route::patch('/{project}/restore', 'ProjectController@restore')->name('projects.restore');
         Route::delete('/{project}/forcedelete', 'ProjectController@forceDelete')->name('projects.forcedelete');
+
+        //Tasks
+        Route::get('/{project}/tasks', 'TaskController@index');
+        Route::post('/{project}/tasks', 'TaskController@store');
+        Route::get('/{project}/tasks/{task}', 'TaskController@show');
+        Route::patch('/{project}/tasks/{task}', 'TaskController@update');
+        Route::delete('/{project}/tasks/{task}', 'TaskController@destroy');
+        Route::patch('/{project}/tasks/{task}/restore', 'TaskController@restore')->name('tasks.restore');
+        Route::delete('/{project}/tasks/{task}/forcedelete', 'TaskController@forceDelete')->name('tasks.forcedelete');
     });
 });
