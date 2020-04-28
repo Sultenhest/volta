@@ -34,9 +34,11 @@ class ManageProjectsTest extends TestCase
 
         $response = $this->postJson('/api/projects', $attributes);
 
-        $response->assertStatus(422)->assertJson([
-            'message' => 'The given data was invalid.'
-        ]);
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'The given data was invalid.'
+            ])
+            ->assertJsonValidationErrors(['title']);
     }
 
     public function test_a_user_can_create_a_project()

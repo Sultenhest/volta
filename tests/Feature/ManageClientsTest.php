@@ -33,9 +33,11 @@ class ManageClientsTest extends TestCase
 
         $response = $this->postJson('/api/clients', $attributes);
 
-        $response->assertStatus(422)->assertJson([
-            'message' => 'The given data was invalid.'
-        ]);
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'The given data was invalid.'
+            ])
+            ->assertJsonValidationErrors(['name']);
     }
 
     public function test_a_user_can_create_a_client()

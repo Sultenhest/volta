@@ -30,15 +30,17 @@ class ManageTaskTest extends TestCase
     {
         $this->apiSignIn();
 
-        $attributes = factory(Task::class)->raw(['title' => '']);
-
         $project = factory(Project::class)->create();
 
-        $response = $this->postJson($project->path() . '/tasks', $attributes);
+        $response = $this->postJson($project->path() . '/tasks', ['title' => '']);
 
-        $response->assertStatus(422)->assertJson([
-            'message' => 'The given data was invalid.'
-        ]);
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'The given data was invalid.'
+            ])
+            ->assertJsonValidationErrors(['title']);
+
+        //dd($response->getData());
     }
 
     public function test_a_task_hours_spent_has_to_be_atleast_0()
@@ -52,47 +54,52 @@ class ManageTaskTest extends TestCase
 
         $project = factory(Project::class)->create();
 
-        $response = $this->postJson($project->path() . '/tasks', $attributes);
-
-        $response->assertStatus(422)->assertJson([
-            'message' => 'The given data was invalid.'
+        $response = $this->postJson($project->path() . '/tasks', [
+            'title'       => $this->faker->sentence(),
+            'hours_spent' => -1
         ]);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'The given data was invalid.'
+            ])
+            ->assertJsonValidationErrors(['hours_spent']);
     }
 
     public function test_a_task_minutes_spent_has_to_be_atleast_0()
     {
         $this->apiSignIn();
 
-        $attributes = factory(Task::class)->raw([
+        $project = factory(Project::class)->create();
+
+        $response = $this->postJson($project->path() . '/tasks', [
             'title'         => $this->faker->sentence(),
             'minutes_spent' => -1
         ]);
 
-        $project = factory(Project::class)->create();
-
-        $response = $this->postJson($project->path() . '/tasks', $attributes);
-
-        $response->assertStatus(422)->assertJson([
-            'message' => 'The given data was invalid.'
-        ]);
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'The given data was invalid.'
+            ])
+            ->assertJsonValidationErrors(['minutes_spent']);
     }
 
     public function test_a_task_minutes_spent_has_to_be_below_60()
     {
         $this->apiSignIn();
 
-        $attributes = factory(Task::class)->raw([
+        $project = factory(Project::class)->create();
+
+        $response = $this->postJson($project->path() . '/tasks', [
             'title'         => $this->faker->sentence(),
             'minutes_spent' => 60
         ]);
 
-        $project = factory(Project::class)->create();
-
-        $response = $this->postJson($project->path() . '/tasks', $attributes);
-
-        $response->assertStatus(422)->assertJson([
-            'message' => 'The given data was invalid.'
-        ]);
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'The given data was invalid.'
+            ])
+            ->assertJsonValidationErrors(['minutes_spent']);
     }
 
     public function test_a_user_can_add_tasks_to_their_project()
