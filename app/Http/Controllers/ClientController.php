@@ -132,6 +132,7 @@ class ClientController extends Controller
      */
     protected function validateRequest()
     {
+        //$request->validate
         return request()->validate([
             'name' => 'required'
         ]);
