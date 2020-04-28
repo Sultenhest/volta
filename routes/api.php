@@ -24,4 +24,13 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
         return $request->user();
     });
     Route::post('/logout', 'UserController@logout');
+
+    //Clients
+    Route::get('/clients', 'ClientController@index');
+    Route::post('/clients', 'ClientController@store');
+    Route::get('/clients/{client}', 'ClientController@show');
+    Route::patch('/clients/{client}', 'ClientController@update');
+    Route::delete('/clients/{client}', 'ClientController@destroy');
+    Route::patch('/clients/{client}/restore', 'ClientController@restore')->name('clients.restore');
+    Route::delete('/clients/{client}/forcedelete', 'ClientController@forceDelete')->name('clients.forcedelete');
 });

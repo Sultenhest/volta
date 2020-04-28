@@ -34,7 +34,7 @@ class ClientTest extends TestCase
 
         $this->assertEquals(
             $client->path(),
-            "/clients/{$client->id}"
+            "/api/clients/{$client->id}"
         );
     }
 

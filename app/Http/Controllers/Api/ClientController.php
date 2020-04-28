@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Client;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class ClientController extends Controller
@@ -18,16 +19,6 @@ class ClientController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -35,9 +26,9 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
-        $client = auth()->user()->clients()->create($this->validateRequest());
+        $client = auth()->user()->clients()->create($this->validateRequest($request));
 
-        return redirect($client->path());
+        return response()->json($client, 201);
     }
 
     /**
@@ -50,18 +41,7 @@ class ClientController extends Controller
     {
         $this->authorize('view', $client);
 
-        return view('clients.show', compact('client'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Client  $client
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Client $client)
-    {
-        //
+        return response()->json($client);
     }
 
     /**
@@ -75,9 +55,9 @@ class ClientController extends Controller
     {
         $this->authorize('update', $client);
 
-        $client->update($this->validateRequest());
+        $client->update($this->validateRequest($request));
 
-        return redirect($client->path());
+        return response()->json($client, 200);
     }
 
     /**
@@ -92,7 +72,7 @@ class ClientController extends Controller
 
         $client->delete();
 
-        return redirect('/clients');
+        return response()->json(null, 204);
     }
 
     /**
@@ -107,7 +87,7 @@ class ClientController extends Controller
 
         $client->restore();
 
-        return redirect($client->path());
+        return response()->json($client, 200);
     }
 
     /**
@@ -122,18 +102,18 @@ class ClientController extends Controller
 
         $client->forceDelete();
 
-        return redirect('/clients');
+        return response()->json(null, 204);
     }
 
     /**
      * Validate the request.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return Illuminate\Http\Request
      */
-    protected function validateRequest()
+    protected function validateRequest(Request $request)
     {
-        //$request->validate
-        return request()->validate([
+        return $request->validate([
             'name' => 'required'
         ]);
     }

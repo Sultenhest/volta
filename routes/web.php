@@ -18,17 +18,6 @@ Route::get('/', function () {
 });
 
 Route::group(['middleware' => 'auth'], function () {
-    //Clients
-    Route::get('/clients', 'ClientController@index');
-    Route::get('/clients/create', 'ClientController@create');
-    Route::post('/clients', 'ClientController@store');
-    Route::get('/clients/{client}', 'ClientController@show');
-    Route::get('/clients/{client}/edit', 'ClientController@edit');
-    Route::patch('/clients/{client}', 'ClientController@update');
-    Route::delete('/clients/{client}', 'ClientController@destroy');
-    Route::patch('/clients/{client}/restore', 'ClientController@restore')->name('clients.restore');
-    Route::delete('/clients/{client}/forcedelete', 'ClientController@forceDelete')->name('clients.forcedelete');
-
     Route::prefix('projects')->group(function () {
         //Projects
         Route::get('/', 'ProjectController@index');

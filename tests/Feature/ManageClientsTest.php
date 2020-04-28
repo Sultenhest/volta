@@ -8,7 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
-class ManageClientsTest extends TestCase
+class ManageClientsApiTest extends TestCase
 {
     use WithFaker, RefreshDatabase;
 
@@ -16,11 +16,9 @@ class ManageClientsTest extends TestCase
     {
         $client = factory(Client::class)->create();
 
-        $this->get('/clients')->assertRedirect('login');
-        $this->get('/clients/create')->assertRedirect('login');
-        $this->post('/clients', $client->toArray())->assertRedirect('login');
+        $this->get('/api/clients')->assertRedirect('login');
+        $this->post('/api/clients', $client->toArray())->assertRedirect('login');
         $this->get($client->path())->assertRedirect('login');
-        $this->get('/clients/edit')->assertRedirect('login');
         $this->patch($client->path())->assertRedirect('login');
         $this->delete($client->path())->assertRedirect('login');
         $this->patch($client->path() . '/restore')->assertRedirect('login');
@@ -29,61 +27,64 @@ class ManageClientsTest extends TestCase
 
     public function test_a_client_requires_a_name()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
         $attributes = factory(Client::class)->raw(['name' => '']);
 
-        $this->post('/clients', $attributes)->assertSessionHasErrors('name');
+        $response = $this->json('POST', '/api/clients', $attributes);
+
+        $response->assertStatus(422)->assertJson([
+            'message' => 'The given data was invalid.'
+        ]);
     }
 
-    public function test_a_user_can_create_a_client()
+    public function test_a_user_can_create_their_client()
     {
-        $this->signIn();
-
-        $this->get('/clients/create')->assertOk();
+        $user = $this->apiSignIn();
 
         $attributes = ['name' => $this->faker->sentence()];
 
-        $response = $this->post('/clients', $attributes);
+        $response = $this->postJson('/api/clients', $attributes)
+            ->assertCreated();
 
         $client = Client::where($attributes)->first();
-
-        $response->assertRedirect($client->path());
-
-        $this->get($client->path())->assertSee($attributes['name']);
-    }
-
-    public function test_a_user_can_update_a_client()
-    {
-        $client = factory(Client::class)->create();
-
-        $this->actingAs($client->user)
-            ->patch($client->path(), $attributes = [
-                'name' => 'New Name'
-            ])
-            ->assertRedirect($client->path());
 
         $this->assertDatabaseHas('clients', $attributes);
     }
 
-    public function test_a_user_can_soft_delete_a_client()
+    public function test_a_user_can_update_their_client()
     {
-        $user = $this->signIn();
+        $client = factory(Client::class)->create();
+
+        $user = $this->apiSignIn($client->user);
+
+        $response = $this->actingAs($user)
+            ->patch($client->path(), $attributes = [
+                'name' => 'New Name'
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('clients', $attributes);
+    }
+
+    public function test_a_user_can_soft_delete_their_client()
+    {
+        $user = $this->apiSignIn();
 
         $attributes = ['name' => 'Client Name'];
 
         $client = $user->clients()->create($attributes);
 
-        $this->actingAs($user)
+        $response = $this->actingAs($user)
             ->delete($client->path())
-            ->assertRedirect('/clients');
+            ->assertNoContent();
 
         $this->assertSoftDeleted('clients', $attributes);
     }
 
-    public function test_a_user_can_restore_a_client()
+    public function test_a_user_can_restore_their_client()
     {
-        $user = $this->signIn();
+        $user = $this->apiSignIn();
 
         $attributes = ['name' => 'Client Name'];
 
@@ -93,14 +94,14 @@ class ManageClientsTest extends TestCase
 
         $response = $this->actingAs($user)
             ->patch($client->path() . '/restore')
-            ->assertRedirect($client->path());
+            ->assertOk();
 
         $this->assertDatabaseHas('clients', $attributes);
     }
 
     public function test_a_user_can_only_force_delete_a_soft_deleted_client()
     {
-        $user = $this->signIn();
+        $user = $this->apiSignIn();
 
         $attributes = ['name' => 'Client Name'];
 
@@ -110,14 +111,14 @@ class ManageClientsTest extends TestCase
 
         $this->actingAs($user)
             ->delete($client->path() . '/forcedelete')
-            ->assertRedirect('/clients');
+            ->assertStatus(204);
 
         $this->assertDatabaseMissing('clients', $attributes);
     }
 
     public function test_an_authenticated_user_cannot_see_clients_of_others()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
         $client = factory(Client::class)->create();
 
@@ -126,7 +127,7 @@ class ManageClientsTest extends TestCase
 
     public function test_an_authenticated_user_cannot_update_clients_of_others()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
         $client = factory(Client::class)->create();
 
@@ -135,7 +136,7 @@ class ManageClientsTest extends TestCase
 
     public function test_an_authenticated_user_cannot_delete_clients_of_others()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
         $client = factory(Client::class)->create();
 
@@ -144,7 +145,7 @@ class ManageClientsTest extends TestCase
 
     public function test_an_authenticated_user_cannot_restore_clients_of_others()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
         $client = factory(Client::class)->create();
 
@@ -155,7 +156,7 @@ class ManageClientsTest extends TestCase
 
     public function test_an_authenticated_user_cannot_force_delete_clients_of_others()
     {
-        $this->signIn();
+        $this->apiSignIn();
 
         $client = factory(Client::class)->create();
 

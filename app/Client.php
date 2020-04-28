@@ -22,9 +22,9 @@ class Client extends Model
     {
         return $this->hasMany(Project::class)->latest('updated_at');
     }
-
+    
     public function path()
     {
-        return "/clients/{$this->id}";
+        return "/api/clients/{$this->id}";
     }
 }
