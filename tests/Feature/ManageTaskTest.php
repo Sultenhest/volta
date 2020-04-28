@@ -39,8 +39,6 @@ class ManageTaskTest extends TestCase
                 'message' => 'The given data was invalid.'
             ])
             ->assertJsonValidationErrors(['title']);
-
-        //dd($response->getData());
     }
 
     public function test_a_task_hours_spent_has_to_be_atleast_0()
@@ -111,7 +109,11 @@ class ManageTaskTest extends TestCase
         $response = $this->postJson($project->path() . '/tasks/',
             $attributes = [
                 'title' => $this->faker->sentence()
-            ])->assertCreated();
+            ])
+            ->assertCreated()
+            ->assertJson([
+                'message' => 'Task was successfully created.',
+            ]);
 
         $this->assertDatabaseHas('tasks', $attributes);
     }
@@ -143,9 +145,27 @@ class ManageTaskTest extends TestCase
             ->patchJson($task->path(), $attributes = [
                 'title' => 'New title',
             ])
-            ->assertOk();
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Task was successfully updated.',
+            ]);
 
         $this->assertDatabaseHas('tasks', $attributes);
+    }
+
+    public function test_a_user_can_soft_delete_their_tasks()
+    {
+        $attributes = ['title' => 'Task Title'];
+
+        $task = factory(Task::class)->create($attributes);
+
+        $user = $this->apiSignIn($task->project->user);
+
+        $response = $this->actingAs($user)
+            ->deleteJson($task->path())
+            ->assertNoContent();
+
+        $this->assertSoftDeleted('tasks', $attributes);
     }
 
     public function test_a_user_can_restore_their_soft_deleted_tasks()
@@ -162,7 +182,10 @@ class ManageTaskTest extends TestCase
 
         $response = $this->actingAs($user)
             ->patchJson($task->path() . '/restore')
-            ->assertOk();
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Task was successfully restored.',
+            ]);
 
         $this->assertDatabaseHas('tasks', $attributes);
     }
@@ -181,7 +204,7 @@ class ManageTaskTest extends TestCase
 
         $this->actingAs($user)
             ->deleteJson($task->path() . '/forcedelete')
-            ->assertStatus(204);
+            ->assertNoContent();
 
         $this->assertDatabaseMissing('tasks', $attributes);
     }

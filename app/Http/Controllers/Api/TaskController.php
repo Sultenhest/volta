@@ -31,7 +31,10 @@ class TaskController extends Controller
     {
         $task = $project->tasks()->create($this->validateRequest($request));
 
-        return response()->json($task, 201);
+        return response()->json([
+            'task'    => $task,
+            'message' => 'Task was successfully created.'
+        ], 201);
     }
 
     /**
@@ -65,7 +68,10 @@ class TaskController extends Controller
         $request['completed_at'] ? $task->complete() : $task->incomplete();
         $request['billed_at']    ? $task->billed()   : $task->unbilled();
 
-        return response()->json($task, 200);
+        return response()->json([
+            'task'    => $task,
+            'message' => 'Task was successfully updated.'
+        ], 200);
     }
 
    /**
@@ -81,7 +87,9 @@ class TaskController extends Controller
         
         $task->delete();
 
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => 'Task was successfully trashed.'
+        ], 204);
     }
 
     /**
@@ -97,7 +105,10 @@ class TaskController extends Controller
         
         $task->restore();
 
-        return response()->json($task, 200);
+        return response()->json([
+            'task'    => $task,
+            'message' => 'Task was successfully restored.'
+        ], 200);
     }
 
     /**
@@ -115,7 +126,9 @@ class TaskController extends Controller
         
         $task->forceDelete();
 
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => 'Task was permanently deleted.'
+        ], 204);
     }
 
     /**
