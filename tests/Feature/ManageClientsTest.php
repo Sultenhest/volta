@@ -25,6 +25,23 @@ class ManageClientsTest extends TestCase
         $this->delete($client->path() . '/forcedelete')->assertRedirect('login');
     }
 
+    public function test_a_user_can_get_all_of_their_clients()
+    {        
+        $user = $this->apiSignIn();
+
+        $user->clients()->create(['name' => 'client 1']);
+        factory(Client::class)->create(['name' => 'other users client 1']);
+        $user->clients()->create(['name' => 'client 2']);
+        factory(Client::class)->create(['name' => 'other users client 2']);
+        $user->clients()->create(['name' => 'client 3']);
+
+        $this->assertCount(3, $user->clients);
+        $this->assertCount(5, Client::all());
+
+        $response = $this->actingAs($user)->getJson('/api/clients')
+            ->assertOk();
+    }
+
     public function test_a_client_requires_a_name()
     {
         $this->apiSignIn();
@@ -45,13 +62,15 @@ class ManageClientsTest extends TestCase
         $user = $this->apiSignIn();
 
         $response = $this->postJson('/api/clients', $attributes = [
-                'name' => $this->faker->sentence()
+                'name'        => $this->faker->sentence(),
+                'description' => $this->faker->sentence()
             ])
             ->assertCreated()
             ->assertJson([
                 'message' => 'Client was successfully created.',
             ]);
 
+        $this->assertEquals($user->id, Client::first()->user_id);
         $this->assertDatabaseHas('clients', $attributes);
     }
 

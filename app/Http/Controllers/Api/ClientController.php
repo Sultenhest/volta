@@ -15,7 +15,9 @@ class ClientController extends Controller
      */
     public function index()
     {
-        //
+        $clients = auth()->user()->clients();
+
+        return response()->json($clients);
     }
 
     /**
@@ -127,7 +129,10 @@ class ClientController extends Controller
     protected function validateRequest(Request $request)
     {
         return $request->validate([
-            'name' => 'required'
+            'name'        => 'sometimes|required',
+            'description' => 'nullable',
+            'vat_abbr'    => 'string|max:2|nullable',
+            'vat'         => 'numeric|nullable'
         ]);
     }
 }
