@@ -25,6 +25,19 @@ class ManageClientsTest extends TestCase
         $this->delete($client->path() . '/forcedelete')->assertRedirect('login');
     }
 
+    public function test_a_user_can_get_a_single_client()
+    {
+        $user = $this->apiSignIn();
+
+        $user->clients()->create(['name' => 'client 1']);
+
+        $this->assertCount(1, $user->clients);
+
+        $response = $this->actingAs($user)->getJson($user->clients->first()->path())
+            ->assertOk()
+            ->assertJsonFragment(['name' => 'client 1']);
+    }
+
     public function test_a_user_can_get_all_of_their_clients()
     {        
         $user = $this->apiSignIn();
@@ -39,7 +52,9 @@ class ManageClientsTest extends TestCase
         $this->assertCount(5, Client::all());
 
         $response = $this->actingAs($user)->getJson('/api/clients')
-            ->assertOk();
+            ->assertOk()
+            ->assertJsonCount(3)
+            ->assertJsonFragment(['projects_count' => '0']);
     }
 
     public function test_a_client_requires_a_name()

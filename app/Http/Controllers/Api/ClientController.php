@@ -15,9 +15,7 @@ class ClientController extends Controller
      */
     public function index()
     {
-        $clients = auth()->user()->clients();
-
-        return response()->json($clients);
+        return auth()->user()->clients->loadCount('projects');
     }
 
     /**
