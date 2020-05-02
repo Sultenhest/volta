@@ -26,6 +26,44 @@ class ManageTaskTest extends TestCase
         $this->delete($task->path() . '/forcedelete')->assertRedirect('login');
     }
 
+    public function test_a_user_can_get_a_single_task()
+    {
+        $user = $this->apiSignIn();
+
+        $project = $user->projects()->create(['title' => 'project 1']);
+
+        $task = $project->tasks()->create(['title' => 'task 1']);
+
+        $this->assertCount(1, $user->projects);
+        $this->assertCount(1, $user->tasks);
+
+        $response = $this->actingAs($user)->getJson($user->tasks->first()->path())
+            ->assertOk()
+            ->assertJsonFragment([
+                'title' => 'task 1'
+            ]);
+    }
+
+    public function test_a_user_can_get_all_of_their_tasks()
+    {        
+        $user = $this->apiSignIn();
+
+        $project = $user->projects()->create(['title' => 'project 1']);
+
+        $project->tasks()->create(['title' => 'task 1']);
+        $project->tasks()->create(['title' => 'task 2']);
+        $project->tasks()->create(['title' => 'task 2']);
+
+        $this->assertCount(3, $user->tasks);
+
+        $response = $this->actingAs($user)->getJson('/api/tasks')
+            ->assertOk()
+            ->assertJsonCount(3)
+            ->assertJsonFragment([
+                'title' => 'project 1'
+            ]);
+    }
+
     public function test_a_task_requires_a_title()
     {
         $this->apiSignIn();

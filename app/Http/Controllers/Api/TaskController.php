@@ -17,7 +17,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
+        return auth()->user()->tasks;
     }
 
     /**
@@ -145,6 +145,7 @@ class TaskController extends Controller
                 Rule::in(auth()->user()->projects()->pluck('id'))
             ],
             'title'         => 'required',
+            'description'   => 'nullable',
             'hours_spent'   => 'sometimes|integer|min:0',
             'minutes_spent' => 'sometimes|integer|min:0|max:59',
         ]);
