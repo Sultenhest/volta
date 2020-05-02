@@ -17,7 +17,7 @@ class ManageTaskTest extends TestCase
     {
         $task = factory(Task::class)->create();
 
-        $this->get($task->project->path() . '/tasks')->assertRedirect('login');
+        $this->get('api/tasks')->assertRedirect('login');
         $this->post($task->project->path() . '/tasks', $task->toArray())->assertRedirect('login');
         $this->get($task->path())->assertRedirect('login');
         $this->patch($task->path())->assertRedirect('login');

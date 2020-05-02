@@ -34,6 +34,8 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     Route::patch('/clients/{client}/restore', 'ClientController@restore')->name('clients.restore');
     Route::delete('/clients/{client}/forcedelete', 'ClientController@forceDelete')->name('clients.forcedelete');
 
+    Route::get('/tasks', 'TaskController@index');
+
     Route::prefix('projects')->group(function () {
         //Projects
         Route::get('/', 'ProjectController@index');
@@ -45,7 +47,6 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
         Route::delete('/{project}/forcedelete', 'ProjectController@forceDelete')->name('projects.forcedelete');
 
         //Tasks
-        Route::get('/{project}/tasks', 'TaskController@index');
         Route::post('/{project}/tasks', 'TaskController@store');
         Route::get('/{project}/tasks/{task}', 'TaskController@show');
         Route::patch('/{project}/tasks/{task}', 'TaskController@update');
