@@ -16,7 +16,7 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        //
+        return auth()->user()->projects->loadCount('tasks');
     }
 
     /**
@@ -127,11 +127,13 @@ class ProjectController extends Controller
     protected function validateRequest(Request $request)
     {
         return $request->validate([
-            'client_id' => [
+            'client_id'   => [
                 'sometimes',
-                Rule::in(auth()->user()->clients()->pluck('id'))
+                Rule::in(auth()->user()->clients()->pluck('id')),
+                'nullable'
             ],
-            'title' => 'required'
+            'title'       => 'required',
+            'description' => 'nullable',
         ]);
     }
 }

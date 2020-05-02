@@ -13,6 +13,8 @@ class Project extends Model
         'client_id', 'title', 'description'
     ];
 
+    protected $with = ['client', 'tasks'];
+
     public function user()
     {
         return $this->belongsTo(User::class);
