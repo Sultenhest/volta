@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Task;
 use App\Project;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -189,6 +190,66 @@ class ManageTaskTest extends TestCase
             ]);
 
         $this->assertDatabaseHas('tasks', $attributes);
+    }
+
+    public function test_a_user_can_complete_a_task()
+    {
+        $task = factory(Task::class)->create();
+
+        $user = $this->apiSignIn($task->project->user);
+
+        $response = $this->actingAs($user)
+            ->patchJson($task->path() . '/completed')
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Task was successfully marked as complete!',
+            ]);
+    }
+
+    public function test_a_user_can_incomplete_a_task()
+    {
+        $task = factory(Task::class)->create();
+
+        $task->complete();
+
+        $user = $this->apiSignIn($task->project->user);
+
+        $response = $this->actingAs($user)
+            ->patchJson($task->path() . '/completed')
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Task was successfully marked as incomplete!',
+            ]);
+    }
+
+    public function test_a_user_can_mark_a_task_as_billed()
+    {
+        $task = factory(Task::class)->create();
+
+        $user = $this->apiSignIn($task->project->user);
+
+        $response = $this->actingAs($user)
+            ->patchJson($task->path() . '/billed')
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Task was successfully marked as billed!',
+            ]);
+    }
+
+    public function test_a_user_can_mark_a_task_as_unbilled()
+    {
+        $task = factory(Task::class)->create();
+
+        $task->billed();
+
+        $user = $this->apiSignIn($task->project->user);
+
+        $response = $this->actingAs($user)
+            ->patchJson($task->path() . '/billed')
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Task was successfully marked as unbilled!',
+            ]);
     }
 
     public function test_a_user_can_soft_delete_their_tasks()

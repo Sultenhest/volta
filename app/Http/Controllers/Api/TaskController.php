@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Task;
 use App\Project;
+use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -61,15 +62,13 @@ class TaskController extends Controller
      */
     public function update(Request $request, Project $project, Task $task)
     {
-        $this->authorize('view', $project);
+        $this->authorize('update', $project);
 
         $task->update($this->validateRequest($request));
 
-        $request['completed_at'] ? $task->complete() : $task->incomplete();
-        $request['billed_at']    ? $task->billed()   : $task->unbilled();
-
         return response()->json([
             'task'    => $task,
+            'project' => $project,
             'message' => 'Task was successfully updated.'
         ], 200);
     }
@@ -132,6 +131,56 @@ class TaskController extends Controller
     }
 
     /**
+     * Toggle completed_at on the specified resource from storage.
+     *
+     * @param  \App\Project  $project
+     * @param  \App\Task  $task
+     * @return \Illuminate\Http\Response
+     */
+    public function completed(Project $project, Task $task) 
+    {
+        $this->authorize('update', $project);
+
+        if( is_null( $task->completed_at ) ) {
+            $task->complete();
+            $message = 'complete!';
+        } else {
+            $task->incomplete();
+            $message = 'incomplete!';
+        }
+
+        return response()->json([
+            'task'    => $task,
+            'message' => 'Task was successfully marked as ' . $message
+        ], 200);
+    }
+
+    /**
+     * Toggle billed_at on the specified resource from storage.
+     *
+     * @param  \App\Project  $project
+     * @param  \App\Task  $task
+     * @return \Illuminate\Http\Response
+     */
+    public function billed(Project $project, Task $task) 
+    {
+        $this->authorize('update', $project);
+
+        if( is_null( $task->billed_at ) ) {
+            $task->billed();
+            $message = 'billed!';
+        } else {
+            $task->unbilled();
+            $message = 'unbilled!';
+        }
+
+        return response()->json([
+            'task'    => $task,
+            'message' => 'Task was successfully marked as ' . $message
+        ], 200);
+    }
+
+    /**
      * Validate the request.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -146,8 +195,8 @@ class TaskController extends Controller
             ],
             'title'         => 'required',
             'description'   => 'nullable',
-            'hours_spent'   => 'sometimes|integer|min:0',
-            'minutes_spent' => 'sometimes|integer|min:0|max:59',
+            'hours_spent'   => 'sometimes|integer|min:0|nullable',
+            'minutes_spent' => 'sometimes|integer|min:0|max:59|nullable'
         ]);
     }
 }
