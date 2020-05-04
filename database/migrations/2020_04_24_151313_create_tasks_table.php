@@ -18,8 +18,8 @@ class CreateTasksTable extends Migration
             $table->foreignId('project_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('description')->nullable();
-            $table->bigInteger('hours_spent')->default(0);
-            $table->bigInteger('minutes_spent')->default(0);
+            $table->bigInteger('hours_spent')->default(0)->nullable();
+            $table->bigInteger('minutes_spent')->default(0)->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamp('billed_at')->nullable();
             $table->timestamps();
