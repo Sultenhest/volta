@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Task extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, RecordsActivity;
     
     protected $fillable = [
         'title', 'description',
@@ -17,6 +17,8 @@ class Task extends Model
     ];
     
     protected $touches = ['project'];
+
+    protected static $recordableEvents = ['created', 'updated', 'deleted'];
 
     public function project()
     {
@@ -31,11 +33,15 @@ class Task extends Model
     public function complete()
     {
         $this->update(['completed_at' => Carbon::now()->toDateTimeString()]);
+
+        $this->recordActivity('completed_task');
     }
 
     public function incomplete()
     {
         $this->update(['completed_at' => NULL]);
+
+        $this->recordActivity('incompleted_task');
     }
 
     public function billed()

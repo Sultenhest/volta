@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, RecordsActivity;
     
     protected $fillable = [
         'client_id', 'title', 'description'
@@ -32,9 +32,12 @@ class Project extends Model
 
     public function addTask($task)
     {
-        $task = $this->tasks()->create($task);
+        return $this->tasks()->create($task);
+    }
 
-        return $task;
+    public function activity()
+    {
+        return $this->hasMany(Activity::class);
     }
 
     public function path()
