@@ -98,6 +98,43 @@ class TriggerActivityTest extends TestCase
         $this->assertEquals('incompleted_task', $project->activity->last()->description);
     }
 
+    public function test_billing_a_task()
+    {
+        $project = factory(Project::class)->create();
+
+        $user = $this->apiSignIn($project->user);
+
+        $task = $project->addTask(['title' => 'task 1']);
+
+        $response = $this->actingAs($user)
+            ->patchJson($task->path() . '/billed');
+
+        $this->assertCount(4, $project->activity);
+        $this->assertEquals('billed_task', $project->activity->last()->description);
+    }
+
+    public function test_unbillling_a_task()
+    {
+        $project = factory(Project::class)->create();
+
+        $user = $this->apiSignIn($project->user);
+
+        $task = $project->addTask(['title' => 'task 1']);
+
+        $response = $this->actingAs($user)
+            ->patchJson($task->path() . '/billed');
+
+        $this->assertCount(4, $project->activity);
+
+        $response = $this->actingAs($user)
+            ->patchJson($task->path() . '/billed');
+
+        $project->refresh();
+
+        $this->assertCount(6, $project->activity);
+        $this->assertEquals('unbilled_task', $project->activity->last()->description);
+    }
+
     public function test_deleting_a_task()
     {
         $project = factory(Project::class)->create();
