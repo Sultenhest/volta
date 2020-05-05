@@ -47,10 +47,14 @@ class Task extends Model
     public function billed()
     {
         $this->update(['billed_at' => Carbon::now()->toDateTimeString()]);
+
+        $this->recordActivity('billed_task');
     }
 
     public function unbilled()
     {
         $this->update(['billed_at' => NULL]);
+
+        $this->recordActivity('unbilled_task');
     }
 }
