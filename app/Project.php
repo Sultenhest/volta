@@ -30,6 +30,13 @@ class Project extends Model
         return $this->hasMany(Task::class);
     }
 
+    public function addTask($task)
+    {
+        $task = $this->tasks()->create($task);
+
+        return $task;
+    }
+
     public function path()
     {
         return "/api/projects/{$this->id}";

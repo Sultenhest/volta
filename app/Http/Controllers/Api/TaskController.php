@@ -30,7 +30,9 @@ class TaskController extends Controller
      */
     public function store(Request $request, Project $project)
     {
-        $task = $project->tasks()->create($this->validateRequest($request));
+        $this->authorize('update', $project);
+
+        $task = $project->addTask($this->validateRequest($request));
 
         return response()->json([
             'task'    => $task,
@@ -195,8 +197,8 @@ class TaskController extends Controller
             ],
             'title'         => 'required',
             'description'   => 'nullable',
-            'hours_spent'   => 'sometimes|integer|min:0|nullable',
-            'minutes_spent' => 'sometimes|integer|min:0|max:59|nullable'
+            'hours_spent'   => 'nullable|sometimes|integer|min:0',
+            'minutes_spent' => 'nullable|sometimes|integer|min:0|max:59'
         ]);
     }
 }

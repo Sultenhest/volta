@@ -67,13 +67,13 @@ class ManageTaskTest extends TestCase
 
     public function test_a_task_requires_a_title()
     {
-        $this->apiSignIn();
+        $user = $this->apiSignIn();
 
-        $project = factory(Project::class)->create();
+        $project = $user->projects()->create(['title' => 'project 1']);
 
-        $response = $this->postJson($project->path() . '/tasks', ['title' => '']);
-
-        $response->assertStatus(422)
+        $response = $this->actingAs($user)
+            ->postJson($project->path() . '/tasks', ['title' => ''])
+            ->assertStatus(422)
             ->assertJson([
                 'message' => 'The given data was invalid.'
             ])
@@ -82,21 +82,16 @@ class ManageTaskTest extends TestCase
 
     public function test_a_task_hours_spent_has_to_be_atleast_0()
     {
-        $this->apiSignIn();
+        $user = $this->apiSignIn();
 
-        $attributes = factory(Task::class)->raw([
-            'title'       => $this->faker->sentence(),
-            'hours_spent' => -1
-        ]);
+        $project = $user->projects()->create(['title' => 'project 1']);
 
-        $project = factory(Project::class)->create();
-
-        $response = $this->postJson($project->path() . '/tasks', [
-            'title'       => $this->faker->sentence(),
-            'hours_spent' => -1
-        ]);
-
-        $response->assertStatus(422)
+        $response = $this->actingAs($user)
+            ->postJson($project->path() . '/tasks', [
+                'title'       => 'Task title',
+                'hours_spent' => -1
+            ])
+            ->assertStatus(422)
             ->assertJson([
                 'message' => 'The given data was invalid.'
             ])
@@ -105,16 +100,16 @@ class ManageTaskTest extends TestCase
 
     public function test_a_task_minutes_spent_has_to_be_atleast_0()
     {
-        $this->apiSignIn();
+        $user = $this->apiSignIn();
 
-        $project = factory(Project::class)->create();
+        $project = $user->projects()->create(['title' => 'project 1']);
 
-        $response = $this->postJson($project->path() . '/tasks', [
-            'title'         => $this->faker->sentence(),
-            'minutes_spent' => -1
-        ]);
-
-        $response->assertStatus(422)
+        $response = $this->actingAs($user)
+            ->postJson($project->path() . '/tasks', [
+                'title'         => $this->faker->sentence(),
+                'minutes_spent' => -1
+            ])
+            ->assertStatus(422)
             ->assertJson([
                 'message' => 'The given data was invalid.'
             ])
@@ -123,16 +118,17 @@ class ManageTaskTest extends TestCase
 
     public function test_a_task_minutes_spent_has_to_be_below_60()
     {
-        $this->apiSignIn();
+        
+        $user = $this->apiSignIn();
 
-        $project = factory(Project::class)->create();
+        $project = $user->projects()->create(['title' => 'project 1']);
 
-        $response = $this->postJson($project->path() . '/tasks', [
-            'title'         => $this->faker->sentence(),
-            'minutes_spent' => 60
-        ]);
-
-        $response->assertStatus(422)
+        $response = $this->actingAs($user)
+            ->postJson($project->path() . '/tasks', [
+                'title'         => $this->faker->sentence(),
+                'minutes_spent' => 60
+            ])
+            ->assertStatus(422)
             ->assertJson([
                 'message' => 'The given data was invalid.'
             ])
@@ -169,8 +165,8 @@ class ManageTaskTest extends TestCase
                 'title'      => 'Task Title'
             ]);
 
-        $response->assertStatus(422)->assertJson([
-            'message' => 'The given data was invalid.'
+        $response->assertForbidden()->assertJson([
+            'message' => 'This action is unauthorized.'
         ]);
     }
 

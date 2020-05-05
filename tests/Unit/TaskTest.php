@@ -32,6 +32,18 @@ class TaskTest extends TestCase
         );
     }
 
+    public function test_a_task_can_be_added_to_a_project()
+    {
+        $project = factory(Project::class)->create();
+
+        $task = $project->addTask([
+            'title' => 'Test Task'
+        ]);
+
+        $this->assertCount(1, $project->tasks);
+        $this->assertTrue($project->tasks->contains($task));
+    }
+
     public function test_a_task_can_be_marked_as_complete()
     {
         $task = factory(Task::class)->create();
