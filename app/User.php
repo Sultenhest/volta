@@ -52,4 +52,9 @@ class User extends Authenticatable
     {
         return $this->hasManyThrough(Task::class, Project::class)->with('project')->latest('updated_at');
     }
+
+    public function activity()
+    {
+        return $this->hasMany(Activity::class);
+    }
 }
