@@ -16,8 +16,9 @@ class TriggerActivityTest extends TestCase
     public function test_creating_a_project()
     {
         $project = factory(Project::class)->create();
+        $user = $this->apiSignIn($project->user);
 
-        $this->assertCount(1, $project->activity);
+        $this->assertCount(1, $user->activity);
 
         tap($project->activity->last(), function($activity) {
             $this->assertEquals('created_project', $activity->description);
@@ -28,12 +29,14 @@ class TriggerActivityTest extends TestCase
     public function test_updating_a_project()
     {
         $project = factory(Project::class)->create();
+        $user = $this->apiSignIn($project->user);
+
         $originalTitle = $project->title;
 
         $project->update(['title' => 'New Title']);
 
-        $this->assertCount(2, $project->activity);
-        $this->assertEquals('created_project', $project->activity->first()->description);
+        $this->assertCount(2, $user->activity);
+        $this->assertEquals('created_project', $user->activity->first()->description);
 
         tap($project->activity->last(), function($activity) use ($originalTitle) {
             $this->assertEquals('updated_project', $activity->description);
@@ -44,6 +47,18 @@ class TriggerActivityTest extends TestCase
 
             $this->assertEquals($expected, $activity->changes);
         });
+    }
+
+    public function test_deleting_a_project()
+    {
+        $project = factory(Project::class)->create();
+
+        $user = $this->apiSignIn($project->user);
+
+        $project->delete();
+
+        $this->assertCount(2, $user->activity);
+        $this->assertEquals('deleted_project', $user->activity->last()->description);
     }
 
     public function test_creating_a_task()
@@ -63,6 +78,33 @@ class TriggerActivityTest extends TestCase
         });
     }
 
+    public function test_updating_a_task()
+    {
+        $project = factory(Project::class)->create();
+
+        $user = $this->apiSignIn($project->user);
+
+        $task = $project->addTask(['title' => 'Original Task Title']);
+
+        $this->assertCount(2, $user->activity);
+        $this->assertEquals('created_project', $user->activity->first()->description);
+        $this->assertEquals('created_task', $user->activity->last()->description);
+
+        $task->update(['title' => 'New Task Title']);
+
+        $this->assertCount(3, $user->refresh()->activity);
+
+        tap($user->activity->last(), function($activity) {
+            $this->assertEquals('updated_task', $activity->description);
+            $expected = [
+                'before' => ['title' => 'Original Task Title'],
+                'after'  => ['title' => 'New Task Title']
+            ];
+
+            $this->assertEquals($expected, $activity->changes);
+        });
+    }
+
     public function test_completing_a_task()
     {
         $project = factory(Project::class)->create();
@@ -74,7 +116,7 @@ class TriggerActivityTest extends TestCase
         $response = $this->actingAs($user)
             ->patchJson($task->path() . '/completed');
 
-        $this->assertCount(4, $user->activity);
+        $this->assertCount(3, $user->activity);
         $this->assertEquals('completed_task', $user->activity->last()->description);
     }
 
@@ -89,14 +131,14 @@ class TriggerActivityTest extends TestCase
         $response = $this->actingAs($user)
             ->patchJson($task->path() . '/completed');
 
-        $this->assertCount(4, $user->activity);
+        $this->assertCount(3, $user->activity);
 
         $response = $this->actingAs($user)
             ->patchJson($task->path() . '/completed');
 
         $user->refresh();
 
-        $this->assertCount(6, $user->activity);
+        $this->assertCount(4, $user->activity);
         $this->assertEquals('incompleted_task', $user->activity->last()->description);
     }
 
@@ -111,7 +153,7 @@ class TriggerActivityTest extends TestCase
         $response = $this->actingAs($user)
             ->patchJson($task->path() . '/billed');
 
-        $this->assertCount(4, $user->activity);
+        $this->assertCount(3, $user->activity);
         $this->assertEquals('billed_task', $user->activity->last()->description);
     }
 
@@ -126,14 +168,14 @@ class TriggerActivityTest extends TestCase
         $response = $this->actingAs($user)
             ->patchJson($task->path() . '/billed');
 
-        $this->assertCount(4, $user->activity);
+        $this->assertCount(3, $user->activity);
 
         $response = $this->actingAs($user)
             ->patchJson($task->path() . '/billed');
 
         $user->refresh();
 
-        $this->assertCount(6, $user->activity);
+        $this->assertCount(4, $user->activity);
         $this->assertEquals('unbilled_task', $user->activity->last()->description);
     }
 

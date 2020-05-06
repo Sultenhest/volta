@@ -12,7 +12,13 @@ trait RecordsActivity
     {
         foreach (self::recordableEvents() as $event) {
             static::$event(function($model) use ($event) {
-                $model->recordActivity($model->activityDescription($event));
+                if ($event === 'updated' && isset(static::$triggerUpdatedFields)) {
+                    if ( $model->wasChanged(self::$triggerUpdatedFields) ) {
+                        $model->recordActivity($model->activityDescription($event));
+                    }
+                } else {
+                    $model->recordActivity($model->activityDescription($event));
+                }
             });
 
             if ($event === 'updated') {
@@ -29,7 +35,7 @@ trait RecordsActivity
             return static::$recordableEvents;
         }
 
-        return ['created', 'updated'];
+        return ['created', 'updated', 'deleted'];
     }
 
     public function recordActivity($description)

@@ -18,7 +18,7 @@ class Task extends Model
     
     protected $touches = ['project'];
 
-    protected static $recordableEvents = ['created', 'updated', 'deleted'];
+    protected static $triggerUpdatedFields = ['title', 'description', 'hours_spent', 'minutes_spent'];
 
     public function project()
     {
