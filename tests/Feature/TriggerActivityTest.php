@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Task;
+use App\Client;
 use App\Project;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,6 +14,54 @@ class TriggerActivityTest extends TestCase
 {
     use WithFaker, RefreshDatabase;
 
+    public function test_creating_a_client()
+    {
+        $client = factory(Client::class)->create();
+        $user = $this->apiSignIn($client->user);
+
+        $this->assertCount(1, $user->activity);
+
+        tap($user->activity->last(), function($activity) {
+            $this->assertEquals('created_client', $activity->description);
+            $this->assertNull($activity->changes);
+        });
+    }
+
+    public function test_updating_a_client()
+    {
+        $client = factory(Client::class)->create();
+        $user = $this->apiSignIn($client->user);
+
+        $originalTitle = $client->name;
+
+        $client->update(['name' => 'New Name']);
+
+        $this->assertCount(2, $user->activity);
+        $this->assertEquals('created_client', $user->activity->first()->description);
+
+        tap($client->activity->last(), function($activity) use ($originalTitle) {
+            $this->assertEquals('updated_client', $activity->description);
+            $expected = [
+                'before' => ['name' => $originalTitle],
+                'after'  => ['name' => 'New Name']
+            ];
+
+            $this->assertEquals($expected, $activity->changes);
+        });
+    }
+
+    public function test_deleting_a_client()
+    {
+        $client = factory(Client::class)->create();
+
+        $user = $this->apiSignIn($client->user);
+
+        $client->delete();
+
+        $this->assertCount(2, $user->activity);
+        $this->assertEquals('deleted_client', $user->activity->last()->description);
+    }
+
     public function test_creating_a_project()
     {
         $project = factory(Project::class)->create();
@@ -20,7 +69,7 @@ class TriggerActivityTest extends TestCase
 
         $this->assertCount(1, $user->activity);
 
-        tap($project->activity->last(), function($activity) {
+        tap($user->activity->last(), function($activity) {
             $this->assertEquals('created_project', $activity->description);
             $this->assertNull($activity->changes);
         });

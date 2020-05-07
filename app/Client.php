@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Client extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, RecordsActivity;
     
     protected $fillable = [
         'name', 'description', 'vat_abbr', 'vat'
