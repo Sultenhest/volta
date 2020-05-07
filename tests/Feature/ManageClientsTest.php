@@ -53,8 +53,7 @@ class ManageClientsTest extends TestCase
 
         $response = $this->actingAs($user)->getJson('/api/clients')
             ->assertOk()
-            ->assertJsonCount(3)
-            ->assertJsonFragment(['projects_count' => '0']);
+            ->assertJsonCount(3);
     }
 
     public function test_a_client_requires_a_name()

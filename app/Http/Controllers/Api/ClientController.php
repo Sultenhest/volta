@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Client;
+use App\Http\Resources\ClientCollection;
+use App\Http\Resources\Client as ClientResource;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -15,7 +18,9 @@ class ClientController extends Controller
      */
     public function index()
     {
-        return auth()->user()->clients->loadCount('projects');
+        $clients = auth()->user()->clients()->paginate(10);
+        
+        return new ClientCollection($clients);
     }
 
     /**
@@ -44,7 +49,7 @@ class ClientController extends Controller
     {
         $this->authorize('view', $client);
 
-        return response()->json($client);
+        return new ClientResource($client);
     }
 
     /**

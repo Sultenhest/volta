@@ -27,4 +27,13 @@ class Client extends Model
     {
         return "/api/clients/{$this->id}";
     }
+
+    public function toArray()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'projects_count' => $this->projects->count()
+        ];
+    }
 }
