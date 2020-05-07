@@ -17,6 +17,7 @@ class Project extends JsonResource
         return parent::toArray($request) + [
             'description' => $this->description,
             'tasks'       => $this->tasks,
+            'activity'    => $this->activity
         ];
     }
 }
