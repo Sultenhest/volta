@@ -34,6 +34,8 @@ class TaskTest extends TestCase
 
     public function test_a_task_can_be_added_to_a_project()
     {
+        $this->apiSignIn();
+
         $project = factory(Project::class)->create();
 
         $task = $project->addTask([

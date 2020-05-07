@@ -32,7 +32,14 @@ class Project extends Model
 
     public function addTask($task)
     {
-        return $this->tasks()->create($task);
+        //return $this->tasks()->create($task);
+        
+        $task = new Task($task);
+        $task->project()->associate($this->id);
+        $task->user()->associate(auth()->id());
+        $task->save();
+
+        return $task;
     }
 
     public function path()

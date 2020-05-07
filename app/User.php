@@ -50,7 +50,7 @@ class User extends Authenticatable
 
     public function tasks()
     {
-        return $this->hasManyThrough(Task::class, Project::class)->with('project')->latest('updated_at');
+        return $this->hasMany(Task::class)->latest('updated_at');
     }
 
     public function activity()

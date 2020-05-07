@@ -20,6 +20,11 @@ class Task extends Model
 
     protected static $triggerUpdatedFields = ['title', 'description', 'hours_spent', 'minutes_spent'];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function project()
     {
         return $this->belongsTo(Project::class);

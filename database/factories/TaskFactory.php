@@ -6,8 +6,10 @@ use App\Task;
 use Faker\Generator as Faker;
 
 $factory->define(Task::class, function (Faker $faker) {
+    $project = factory(App\Project::class)->create();
     return [
-        'project_id' => factory(App\Project::class)->create(),
+        'user_id'    => $project->user->id,
+        'project_id' => $project,
         'title'      => $faker->sentence(),
     ];
 });
