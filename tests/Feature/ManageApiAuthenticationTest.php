@@ -27,6 +27,7 @@ class ManageApiAuthenticationTest extends TestCase
         $this->get('/api/user')->assertRedirect('login');
     }
 
+    // TODO
     public function a_user_can_register()
     {
         $response = $this->postJson('/api/register', [
@@ -42,6 +43,7 @@ class ManageApiAuthenticationTest extends TestCase
            
     }
 
+    // TODO
     public function a_user_can_log_in()
     {
         $response = $this->postJson('/api/login', [
