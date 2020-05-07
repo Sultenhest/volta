@@ -62,4 +62,16 @@ class Task extends Model
 
         $this->recordActivity('unbilled_task');
     }
+
+    public function toArray()
+    {
+        return [
+            'id'            => $this->id,
+            'title'         => $this->title,
+            'project_id'    => $this->project_id,
+            'project_title' => optional($this->project)->title,
+            'completed_at'  => $this->completed_at,
+            'billed_at'     => $this->billed_at
+        ];
+    }
 }

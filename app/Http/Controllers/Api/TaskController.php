@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Task;
 use App\Project;
-use Carbon\Carbon;
+use App\Http\Resources\TaskCollection;
+use App\Http\Resources\Task as TaskResource;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -17,8 +19,10 @@ class TaskController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        return auth()->user()->tasks;
+    {   
+        $tasks = auth()->user()->tasks()->paginate(10);
+        
+        return new TaskCollection($tasks);
     }
 
     /**
