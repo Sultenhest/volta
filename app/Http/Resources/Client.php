@@ -16,11 +16,11 @@ class Client extends JsonResource
     {
         return parent::toArray($request) + [
             'description' => $this->description,
-            'vat_abbr' => $this->vat_abbr,
-            'vat' => $this->vat,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-            'projects' => $this->projects
+            'vat_abbr'    => $this->vat_abbr,
+            'vat'         => $this->vat,
+            'created_at'  => $this->created_at,
+            'updated_at'  => $this->updated_at,
+            'projects'    => $this->projects
         ];
     }
 }
