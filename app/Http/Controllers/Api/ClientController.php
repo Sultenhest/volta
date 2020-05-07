@@ -34,7 +34,7 @@ class ClientController extends Controller
         $client = auth()->user()->clients()->create($this->validateRequest($request));
 
         return response()->json([
-            'client'  => $client,
+            'client'  => new ClientResource($client),
             'message' => 'Client was successfully created.'
         ], 201);
     }
@@ -66,7 +66,7 @@ class ClientController extends Controller
         $client->update($this->validateRequest($request));
 
         return response()->json([
-            'client'  => $client,
+            'client'  => new ClientResource($client),
             'message' => 'Client was successfully updated.'
         ], 200);
     }
@@ -101,7 +101,7 @@ class ClientController extends Controller
         $client->restore();
 
         return response()->json([
-            'client'  => $client,
+            'client'  => new ClientResource($client),
             'message' => 'Client was successfully restored.'
         ], 200);
     }

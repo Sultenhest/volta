@@ -35,7 +35,7 @@ class ProjectController extends Controller
         $project = auth()->user()->projects()->create($this->validateRequest($request));
 
         return response()->json([
-            'project' => $project,
+            'project' => new ProjectResource($project),
             'message' => 'Project was successfully created.'
         ], 201);
     }
@@ -67,7 +67,7 @@ class ProjectController extends Controller
         $project->update($this->validateRequest($request));
 
         return response()->json([
-            'project' => $project,
+            'project' => new ProjectResource($project),
             'message' => 'Project was successfully updated.'
         ], 200);
     }
@@ -102,7 +102,7 @@ class ProjectController extends Controller
         $project->restore();
 
         return response()->json([
-            'project' => $project,
+            'project' => new ProjectResource($project),
             'message' => 'Project was successfully restored.'
         ], 200);
     }

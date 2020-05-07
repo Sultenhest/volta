@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Task;
 use App\Project;
+use App\Http\Resources\Project as ProjectResource;
 use App\Http\Resources\TaskCollection;
 use App\Http\Resources\Task as TaskResource;
 
@@ -39,7 +40,7 @@ class TaskController extends Controller
         $task = $project->addTask($this->validateRequest($request));
 
         return response()->json([
-            'task'    => $task,
+            'task'    => new TaskResource($task),
             'message' => 'Task was successfully created.'
         ], 201);
     }
@@ -55,7 +56,7 @@ class TaskController extends Controller
     {
         $this->authorize('view', $project);
 
-        return response()->json($task);
+        return new TaskResource($task);
     }
 
     /**
@@ -73,8 +74,8 @@ class TaskController extends Controller
         $task->update($this->validateRequest($request));
 
         return response()->json([
-            'task'    => $task,
-            'project' => $project,
+            'task'    => new TaskResource($task),
+            'project' => new ProjectResource($project),
             'message' => 'Task was successfully updated.'
         ], 200);
     }
@@ -111,7 +112,7 @@ class TaskController extends Controller
         $task->restore();
 
         return response()->json([
-            'task'    => $task,
+            'task'    => new TaskResource($task),
             'message' => 'Task was successfully restored.'
         ], 200);
     }
@@ -156,7 +157,7 @@ class TaskController extends Controller
         }
 
         return response()->json([
-            'task'    => $task,
+            'task'    => new TaskResource($task),
             'message' => 'Task was successfully marked as ' . $message
         ], 200);
     }
@@ -181,7 +182,7 @@ class TaskController extends Controller
         }
 
         return response()->json([
-            'task'    => $task,
+            'task'    => new TaskResource($task),
             'message' => 'Task was successfully marked as ' . $message
         ], 200);
     }
