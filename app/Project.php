@@ -13,8 +13,6 @@ class Project extends Model
         'client_id', 'title', 'description'
     ];
 
-    protected $with = ['client', 'tasks'];
-
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -45,5 +43,32 @@ class Project extends Model
     public function path()
     {
         return "/api/projects/{$this->id}";
+    }
+
+    protected function completed_tasks()
+    {
+        return count($this->tasks->filter(function ($task) {
+            return $task->completed_at;
+        }));
+    }
+
+    protected function incompleted_tasks()
+    {
+        return count($this->tasks->filter(function ($task) {
+            return !$task->completed_at;
+        }));
+    }
+
+    public function toArray()
+    {
+        return [
+            'id'                => $this->id,
+            'title'             => $this->title,
+            'client_id'         => $this->client_id,
+            'client_name'       => optional($this->client)->name,
+            'tasks_count'       => $this->tasks->count(),
+            'completed_tasks'   => $this->completed_tasks(),
+            'incompleted_tasks' => $this->incompleted_tasks()
+        ];
     }
 }

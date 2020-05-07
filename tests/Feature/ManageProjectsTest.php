@@ -26,20 +26,26 @@ class ManageProjectsTest extends TestCase
         $this->delete($project->path() . '/forcedelete')->assertRedirect('login');
     }
 
-    public function test_a_user_can_get_a_single_client()
+    public function test_a_user_can_get_a_single_project()
     {
         $user = $this->apiSignIn();
 
-        $user->projects()->create(['title' => 'client 1']);
+        $project = $user->projects()->create(['title' => 'project 1']);
 
+        $project->addTask(['title' => 'task 1']);
+        $project->addTask(['title' => 'task 2'])->complete();
+        $project->addTask(['title' => 'task 3']);
+
+        $this->assertCount(3, $project->tasks);
         $this->assertCount(1, $user->projects);
 
-        $response = $this->actingAs($user)->getJson($user->projects->first()->path())
+        $response = $this->actingAs($user)->getJson($project->path())
             ->assertOk()
             ->assertJsonFragment([
-                'title'  => 'client 1',
-                'client' => null,
-                'tasks'  => []
+                'title'             => 'project 1',
+                'tasks_count'       => 3,
+                'completed_tasks'   => 1,
+                'incompleted_tasks' => 2
             ]);
     }
 
@@ -58,11 +64,7 @@ class ManageProjectsTest extends TestCase
 
         $response = $this->actingAs($user)->getJson('/api/projects')
             ->assertOk()
-            ->assertJsonCount(3)
-            ->assertJsonFragment([
-                'tasks_count' => '0',
-                'tasks'       => []
-            ]);
+            ->assertJsonCount(3);
     }
 
     public function test_a_project_requires_a_title()

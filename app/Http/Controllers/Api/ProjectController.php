@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Project;
+use App\Http\Resources\ProjectCollection;
+use App\Http\Resources\Project as ProjectResource;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -16,7 +19,9 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        return auth()->user()->projects->loadCount('tasks');
+        $projects = auth()->user()->projects()->paginate(10);
+        
+        return new ProjectCollection($projects);
     }
 
     /**
@@ -45,7 +50,7 @@ class ProjectController extends Controller
     {
         $this->authorize('view', $project);
 
-        return response()->json($project);
+        return new ProjectResource($project);
     }
 
     /**
