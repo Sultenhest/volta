@@ -21,4 +21,11 @@ class Activity extends Model
     {
         return $this->morphTo();
     }
+
+    public function toArray()
+    {
+        return parent::toArray() + [
+            'echo_description' => ucwords( str_replace('_', ' ', $this->description) )
+        ];
+    }
 }

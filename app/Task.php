@@ -71,7 +71,10 @@ class Task extends Model
             'project_id'    => $this->project_id,
             'project_title' => optional($this->project)->title,
             'completed_at'  => $this->completed_at,
-            'billed_at'     => $this->billed_at
+            'billed_at'     => $this->billed_at,
+            'hours_spent'   => $this->hours_spent,
+            'minutes_spent' => $this->minutes_spent,
+            'updated_at'    => $this->updated_at
         ];
     }
 }

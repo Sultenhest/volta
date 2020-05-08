@@ -31,8 +31,8 @@ class Client extends Model
     public function toArray()
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
+            'id'             => $this->id,
+            'name'           => $this->name,
             'projects_count' => $this->projects->count()
         ];
     }

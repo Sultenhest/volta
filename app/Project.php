@@ -68,7 +68,8 @@ class Project extends Model
             'client_name'       => optional($this->client)->name,
             'tasks_count'       => $this->tasks->count(),
             'completed_tasks'   => $this->completed_tasks(),
-            'incompleted_tasks' => $this->incompleted_tasks()
+            'incompleted_tasks' => $this->incompleted_tasks(),
+            'updated_at'        => $this->updated_at
         ];
     }
 }
