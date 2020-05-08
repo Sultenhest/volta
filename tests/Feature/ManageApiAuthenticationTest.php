@@ -27,20 +27,29 @@ class ManageApiAuthenticationTest extends TestCase
         $this->get('/api/user')->assertRedirect('login');
     }
 
-    // TODO
-    public function a_user_can_register()
+    public function test_a_user_can_register()
     {
-        $response = $this->postJson('/api/register', [
-            'name'     => $this->faker->name(),
+        $response = $this->postJson('/api/register', [ 
+            'name'     => $this->faker->name,
             'username' => $this->faker->email(),
             'password' => $this->faker->password()
         ]);
 
         $response->assertStatus(201)
-            ->assertJsonStructure([
-                'success' => ['token', 'name']
+            ->assertJsonFragment([
+                'message' => 'You were successfully registered!'
             ]);
-           
+    }
+
+    public function test_registration_requires_email_and_password()
+    {
+        $response = $this->postJson('/api/register', []);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'The given data was invalid.'
+            ])
+            ->assertJsonValidationErrors(['username', 'password']);
     }
 
     // TODO

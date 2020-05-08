@@ -26,26 +26,40 @@ class AuthController extends Controller
         return response($response, 200);
     }
 
-    public function register()
+    /**
+     * Register the user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function register(Request $request)
     {
-        $this->validate(request(), [
-            'name'     => 'required|string|max:255',
-            'username' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
-        ]);
+        $this->validateRequest($request);
 
         $user = User::create([
-            'name'     => request('name'),
-            'email'    => request('username'),
-            'password' => Hash::make(request('password')),
+            'name'     => $request['name'],
+            'email'    => $request['username'],
+            'password' => Hash::make($request['password']),
         ]);
 
-        $response = $this->grantPasswordToken(
-            $user->email,
-            request('password')
-        );
+        return response()->json([
+            'message' => 'You were successfully registered!'
+        ], 201);
+    }
 
-        return response($response, 201);
+    /**
+     * Validate the request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return Illuminate\Http\Request
+     */
+    protected function validateRequest(Request $request)
+    {
+        return $request->validate([
+            'name'     => 'required|string|max:255',
+            'username' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
     }
 
     public function logout()
