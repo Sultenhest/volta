@@ -25,7 +25,7 @@ class Project extends Model
 
     public function tasks()
     {
-        return $this->hasMany(Task::class);
+        return $this->hasMany(Task::class)->latest('updated_at');
     }
 
     public function addTask($task)
