@@ -11,6 +11,7 @@ class Task extends Model
     use SoftDeletes, RecordsActivity;
     
     protected $fillable = [
+        'user_id', 'project_id',
         'title', 'description',
         'hours_spent', 'minutes_spent',
         'completed_at', 'billed_at'
