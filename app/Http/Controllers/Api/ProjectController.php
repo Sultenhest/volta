@@ -9,6 +9,7 @@ use App\Http\Resources\Project as ProjectResource;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Redis;
 
 class ProjectController extends Controller
 {
@@ -49,6 +50,8 @@ class ProjectController extends Controller
     public function show(Project $project)
     {
         $this->authorize('view', $project);
+
+        Redis::zadd('user.' . auth()->id() . '.projectsInProgress', time(), $project->id);
 
         return new ProjectResource($project);
     }

@@ -25,6 +25,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     });
     Route::post('/logout', 'AuthController@logout');
 
+    //Dashboard
+    Route::get('/dashboard', 'DashboardController@index');
+
     //Clients
     Route::get('/clients', 'ClientController@index');
     Route::post('/clients', 'ClientController@store');

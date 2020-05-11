@@ -57,4 +57,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(Activity::class);
     }
+
+    public function toArray()
+    {
+        return parent::toArray() + [
+            'clients_count'  => $this->clients->count(),
+            'projects_count' => $this->projects->count(),
+            'tasks_count'    => $this->tasks->count()
+        ];
+    }
 }
