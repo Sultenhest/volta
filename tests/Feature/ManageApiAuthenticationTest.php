@@ -24,7 +24,10 @@ class ManageApiAuthenticationTest extends TestCase
 
     public function test_an_unauthenticated_user_cannot_access_user_information()
     {
-        $this->get('/api/user')->assertRedirect('login');
+        $this->withoutExceptionHandling();
+        $this->expectException(\Illuminate\Auth\AuthenticationException::class);
+        
+        $this->get('/api/user')->assertResponseStatus(403);
     }
 
     public function test_a_user_can_register()
