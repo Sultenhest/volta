@@ -85,6 +85,8 @@ class ProjectController extends Controller
     {
         $this->authorize('delete', $project);
 
+        Redis::zrem('user.' . auth()->id() . '.projectsInProgress', $project->id);
+
         $project->delete();
 
         return response()->json([
