@@ -33,8 +33,26 @@ class Activity extends Model
             });
     }
 
-    //['description', 'completed_task']
-    //format('W')
+    public static function statistics()
+    {
+        $activities = static::where('user_id', auth()->id())
+            ->latest()
+            ->get()
+            ->groupBy(function ($activity) {
+                return $activity->created_at->format('W');
+            })
+            ->take(10);
+
+        $groupedTypes = $activities->map(function ($item, $key) {
+            return collect($item)->groupBy('description');
+        });
+        
+        return $groupedTypes->map(function ($item, $key) {
+            return $item->map(function ($item, $key) {
+                return $item->count();
+            });
+        });
+    }
 
     public function toArray()
     {

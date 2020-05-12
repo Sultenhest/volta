@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Project;
+use App\Activity;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -24,8 +25,9 @@ class DashboardController extends Controller
         });
 
         return response()->json([
-            'projects' => $projectsInProgress,
-            'message'  => 'Yeah man'
+            'projects'   => $projectsInProgress,
+            'statistics' => Activity::statistics(),
+            'message'    => 'Yeah man'
         ], 200);
     }
 }

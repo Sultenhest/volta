@@ -55,4 +55,45 @@ class ActivityTest extends TestCase
             Carbon::now()->subWeek()->format('Y-m-d')
         ));
     }
+
+    public function test_it_fetches_weekly_statistics()
+    {
+        $user = $this->apiSignIn();
+
+        $user->projects()->create(['title' => 'project 1']);
+        $project = $user->projects()->create(['title' => 'project 2']);
+        $project->addTask(['title' => 'task 1']);
+        $project->addTask(['title' => 'task 2']);
+        $project->addTask(['title' => 'task 3']);
+        $user->projects()->create(['title' => 'project 3']);
+
+        $user->activity()->first()->update([
+            'created_at' => Carbon::now()->subWeek()
+        ]);
+
+        $this->assertCount(6, $user->activity);
+
+        $statistics = Activity::statistics();
+
+        $this->assertTrue($statistics->keys()->contains(
+            Carbon::now()->format('W')
+        ));
+
+        $this->assertTrue($statistics->keys()->contains(
+            Carbon::now()->subWeek()->format('W')
+        ));
+
+        $this->assertCount(2, $statistics->first());
+        $this->assertCount(1, $statistics->last());
+        $this->assertTrue(
+            count(array_intersect(
+                $statistics->first()->keys()->toArray(),
+                ['created_project', 'created_task']
+            )) == count(['created_project', 'created_task'])
+        );
+        $this->assertTrue(in_array(
+            'created_project',
+            $statistics->last()->keys()->toArray()
+        ));
+    }
 }
