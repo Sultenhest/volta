@@ -1,0 +1,33 @@
+<?php
+
+namespace Tests\Feature;
+
+use Carbon\Carbon;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
+
+class ActivityDataTest extends TestCase
+{
+    use WithFaker, RefreshDatabase;
+
+    public function test_guests_cannot_manage_clients()
+    {
+        $this->get('/api/activities')->assertRedirect('login');
+    }
+
+    public function test_a_user_can_get_all_their_activities()
+    {
+        $user = $this->apiSignIn();
+
+        $user->projects()->create(['title' => 'project 1']);
+        $user->projects()->create(['title' => 'project 2']);
+        $user->projects()->create(['title' => 'project 3']);
+
+        $response = $this->actingAs($user)
+            ->getJson('/api/activities')
+            ->assertOk()
+            ->assertJsonCount(3, Carbon::now()->format('Y-m-d'));
+    }
+}

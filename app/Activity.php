@@ -22,6 +22,20 @@ class Activity extends Model
         return $this->morphTo();
     }
 
+    public static function feed()
+    {
+        return static::where('user_id', auth()->id())
+            ->latest()
+            ->with('subject')
+            ->paginate(50)
+            ->groupBy(function ($activity) {
+                return $activity->created_at->format('Y-m-d');
+            });
+    }
+
+    //['description', 'completed_task']
+    //format('W')
+
     public function toArray()
     {
         return parent::toArray() + [
