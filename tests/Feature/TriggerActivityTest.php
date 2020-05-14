@@ -16,8 +16,11 @@ class TriggerActivityTest extends TestCase
 
     public function test_creating_a_client()
     {
-        $client = factory(Client::class)->create();
-        $user = $this->apiSignIn($client->user);
+        $user = $this->apiSignIn();
+
+        $client = factory(Client::class)->create([
+            'user_id' => $user->id
+        ]);
 
         $this->assertCount(1, $user->activity);
 
@@ -29,8 +32,11 @@ class TriggerActivityTest extends TestCase
 
     public function test_updating_a_client()
     {
-        $client = factory(Client::class)->create();
-        $user = $this->apiSignIn($client->user);
+        $user = $this->apiSignIn();
+
+        $client = factory(Client::class)->create([
+            'user_id' => $user->id
+        ]);
 
         $originalTitle = $client->name;
 
@@ -52,9 +58,11 @@ class TriggerActivityTest extends TestCase
 
     public function test_deleting_a_client()
     {
-        $client = factory(Client::class)->create();
+        $user = $this->apiSignIn();
 
-        $user = $this->apiSignIn($client->user);
+        $client = factory(Client::class)->create([
+            'user_id' => $user->id
+        ]);
 
         $client->delete();
 
@@ -64,8 +72,11 @@ class TriggerActivityTest extends TestCase
 
     public function test_creating_a_project()
     {
-        $project = factory(Project::class)->create();
-        $user = $this->apiSignIn($project->user);
+        $user = $this->apiSignIn();
+
+        $project = factory(Project::class)->create([
+            'user_id' => $user->id
+        ]);
 
         $this->assertCount(1, $user->activity);
 
@@ -77,8 +88,11 @@ class TriggerActivityTest extends TestCase
 
     public function test_updating_a_project()
     {
-        $project = factory(Project::class)->create();
-        $user = $this->apiSignIn($project->user);
+        $user = $this->apiSignIn();
+
+        $project = factory(Project::class)->create([
+            'user_id' => $user->id
+        ]);
 
         $originalTitle = $project->title;
 
@@ -100,9 +114,11 @@ class TriggerActivityTest extends TestCase
 
     public function test_deleting_a_project()
     {
-        $project = factory(Project::class)->create();
+        $user = $this->apiSignIn();
 
-        $user = $this->apiSignIn($project->user);
+        $project = factory(Project::class)->create([
+            'user_id' => $user->id
+        ]);
 
         $project->delete();
 
@@ -112,9 +128,11 @@ class TriggerActivityTest extends TestCase
 
     public function test_creating_a_task()
     {
-        $project = factory(Project::class)->create();
+        $user = $this->apiSignIn();
 
-        $user = $this->apiSignIn($project->user);
+        $project = factory(Project::class)->create([
+            'user_id' => $user->id
+        ]);
 
         $task = $project->addTask(['title' => 'task 1']);
 
@@ -129,9 +147,11 @@ class TriggerActivityTest extends TestCase
 
     public function test_updating_a_task()
     {
-        $project = factory(Project::class)->create();
+        $user = $this->apiSignIn();
 
-        $user = $this->apiSignIn($project->user);
+        $project = factory(Project::class)->create([
+            'user_id' => $user->id
+        ]);
 
         $task = $project->addTask(['title' => 'Original Task Title']);
 
@@ -156,9 +176,11 @@ class TriggerActivityTest extends TestCase
 
     public function test_completing_a_task()
     {
-        $project = factory(Project::class)->create();
+        $user = $this->apiSignIn();
 
-        $user = $this->apiSignIn($project->user);
+        $project = factory(Project::class)->create([
+            'user_id' => $user->id
+        ]);
 
         $task = $project->addTask(['title' => 'task 1']);
 
@@ -171,9 +193,11 @@ class TriggerActivityTest extends TestCase
 
     public function test_incompleting_a_task()
     {
-        $project = factory(Project::class)->create();
+        $user = $this->apiSignIn();
 
-        $user = $this->apiSignIn($project->user);
+        $project = factory(Project::class)->create([
+            'user_id' => $user->id
+        ]);
 
         $task = $project->addTask(['title' => 'task 1']);
 
@@ -193,9 +217,11 @@ class TriggerActivityTest extends TestCase
 
     public function test_billing_a_task()
     {
-        $project = factory(Project::class)->create();
+        $user = $this->apiSignIn();
 
-        $user = $this->apiSignIn($project->user);
+        $project = factory(Project::class)->create([
+            'user_id' => $user->id
+        ]);
 
         $task = $project->addTask(['title' => 'task 1']);
 
@@ -208,9 +234,11 @@ class TriggerActivityTest extends TestCase
 
     public function test_unbillling_a_task()
     {
-        $project = factory(Project::class)->create();
+        $user = $this->apiSignIn();
 
-        $user = $this->apiSignIn($project->user);
+        $project = factory(Project::class)->create([
+            'user_id' => $user->id
+        ]);
 
         $task = $project->addTask(['title' => 'task 1']);
 
@@ -230,9 +258,11 @@ class TriggerActivityTest extends TestCase
 
     public function test_deleting_a_task()
     {
-        $project = factory(Project::class)->create();
+        $user = $this->apiSignIn();
 
-        $user = $this->apiSignIn($project->user);
+        $project = factory(Project::class)->create([
+            'user_id' => $user->id
+        ]);
 
         $task = $project->addTask(['title' => 'task 1']);
 

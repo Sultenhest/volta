@@ -18,9 +18,11 @@ class ActivityTest extends TestCase
 
     public function test_it_has_a_user()
     {   
-        $project = factory(Project::class)->create();
+        $user = $this->apiSignIn();
 
-        $user = $this->apiSignIn($project->user);
+        $project = factory(Project::class)->create([
+            'user_id' => $user->id
+        ]);
 
         $this->assertDatabaseHas('activities', [
             'user_id'      => $user->id,

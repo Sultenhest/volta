@@ -10,6 +10,8 @@ trait RecordsActivity
 
     public static function bootRecordsActivity()
     {
+        if (auth()->guest()) return;
+         
         foreach (self::recordableEvents() as $event) {
             static::$event(function($model) use ($event) {
                 if ($event === 'updated' && isset(static::$triggerUpdatedFields)) {
@@ -27,6 +29,12 @@ trait RecordsActivity
                 });
             }
         }
+
+        static::deleted(function ($model) {
+            if ($model->forceDeleting) {
+                $model->activity()->delete();
+            }
+        });
     }
 
     protected static function recordableEvents()

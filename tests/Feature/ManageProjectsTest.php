@@ -157,6 +157,7 @@ class ManageProjectsTest extends TestCase
         $attributes = ['title' => 'Project Title'];
 
         $project = $user->projects()->create($attributes);
+        $task = $project->addTask(['title' => 'Test Task']);
 
         $project->delete();
 
@@ -165,6 +166,11 @@ class ManageProjectsTest extends TestCase
             ->assertNoContent();
 
         $this->assertDatabaseMissing('projects', $attributes);
+        $this->assertDatabaseMissing('tasks', ['id' => $task->id]);
+        $this->assertDatabaseMissing('activities', [
+            'subject_id'   => $project->id,
+            'subject_type' => get_class($project)
+        ]);
     }
 
     public function test_a_user_can_add_their_own_clients_to_projects()

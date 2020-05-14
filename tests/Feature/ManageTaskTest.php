@@ -305,6 +305,10 @@ class ManageTaskTest extends TestCase
             ->assertNoContent();
 
         $this->assertDatabaseMissing('tasks', $attributes);
+        $this->assertDatabaseMissing('activities', [
+            'subject_id'   => $task->id,
+            'subject_type' => get_class($task)
+        ]);
     }
 
     public function test_an_authenticated_user_cannot_see_tasks_of_others()

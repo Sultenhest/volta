@@ -156,6 +156,10 @@ class ManageClientsTest extends TestCase
             ->assertNoContent();
 
         $this->assertDatabaseMissing('clients', $attributes);
+        $this->assertDatabaseMissing('activities', [
+            'subject_id'   => $client->id,
+            'subject_type' => get_class($client)
+        ]);
     }
 
     public function test_an_authenticated_user_cannot_see_clients_of_others()

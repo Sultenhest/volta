@@ -13,6 +13,20 @@ class Project extends Model
         'client_id', 'title', 'description'
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($project) {
+            if ($project->forceDeleting) {
+                $project->tasks->each( function($task) {
+                    $task->delete();
+                    $task->forceDelete();
+                });
+            }
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
