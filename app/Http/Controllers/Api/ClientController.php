@@ -18,7 +18,7 @@ class ClientController extends Controller
      */
     public function index()
     {
-        $clients = auth()->user()->clients()->paginate(10);
+        $clients = auth()->user()->clients()->get();
         
         return new ClientCollection($clients);
     }
