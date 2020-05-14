@@ -27,7 +27,8 @@ class Activity extends Model
         return static::where('user_id', auth()->id())
             ->latest()
             ->with('subject')
-            ->paginate(50)
+            ->take(50)
+            ->get()
             ->groupBy(function ($activity) {
                 return $activity->created_at->format('Y-m-d');
             });

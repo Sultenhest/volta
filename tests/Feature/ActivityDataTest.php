@@ -25,9 +25,8 @@ class ActivityDataTest extends TestCase
         $user->projects()->create(['title' => 'project 2']);
         $user->projects()->create(['title' => 'project 3']);
 
-        $response = $this->actingAs($user)
-            ->getJson('/api/activities')
+        $response = $this->actingAs($user)->getJson('/api/activities')
             ->assertOk()
-            ->assertJsonCount(3, Carbon::now()->format('Y-m-d'));
+            ->assertJsonCount(3);
     }
 }

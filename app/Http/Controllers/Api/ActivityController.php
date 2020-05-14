@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Activity;
+use App\Http\Resources\ActivityCollection;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -16,6 +17,8 @@ class ActivityController extends Controller
      */
     public function index()
     {
-        return Activity::feed();
+        $activities = auth()->user()->activity()->paginate(20);
+        
+        return new ActivityCollection($activities);
     }
 }
