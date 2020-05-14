@@ -12,7 +12,7 @@ class ActivityDataTest extends TestCase
 {
     use WithFaker, RefreshDatabase;
 
-    public function test_guests_cannot_manage_clients()
+    public function test_guests_cannot_access_activity()
     {
         $this->get('/api/activities')->assertRedirect('login');
     }
