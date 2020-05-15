@@ -14,7 +14,12 @@ class Task extends Model
         'user_id', 'project_id',
         'title', 'description',
         'hours_spent', 'minutes_spent',
-        'completed_at', 'billed_at'
+        'completed_at', 'billed_at', 'created_at'
+    ];
+
+    protected $casts = [
+        'completed_at' => 'datetime',
+        'billed_at'    => 'datetime'
     ];
     
     protected $touches = ['project'];

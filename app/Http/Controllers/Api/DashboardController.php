@@ -26,7 +26,6 @@ class DashboardController extends Controller
 
         return response()->json([
             'projects'   => $projectsInProgress,
-            'statistics' => Activity::statistics(),
             'feed'       => Activity::feed(),
             'message'    => 'Yeah man'
         ], 200);
