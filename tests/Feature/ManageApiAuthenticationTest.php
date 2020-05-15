@@ -49,7 +49,7 @@ class ManageApiAuthenticationTest extends TestCase
             ->assertJson([
                 'message' => 'The given data was invalid.'
             ])
-            ->assertJsonValidationErrors(['username', 'password']);
+            ->assertJsonValidationErrors(['email', 'password']);
     }
 
     // TODO

@@ -61,7 +61,6 @@ class User extends Authenticatable
     public function toArray()
     {
         return parent::toArray() + [
-            'statistics'     => $this->statistics(),
             'clients_count'  => $this->clients->count(),
             'projects_count' => $this->projects->count(),
             'tasks_count'    => $this->tasks->count()

@@ -6,11 +6,13 @@ trait HasStatistics
 {
     public function statistics()
     {
-        return collect(['tasks' => [
-            'billed_at'    => $this->billedStatistics(),
-            'completed_at' => $this->completedStatistics(),
-            'created_at'   => $this->createdStatistics()
-        ]]);
+        return collect([
+            'tasks' => [
+                'billed_at'    => $this->billedStatistics(),
+                'completed_at' => $this->completedStatistics(),
+                'created_at'   => $this->createdStatistics()
+            ]
+        ]);
     }
 
     private function billedStatistics()
@@ -23,7 +25,7 @@ trait HasStatistics
                 return $task->billed_at->format('W');
             })
             ->take(10)->map(function ($item, $key) {
-                return $key = $item->count();
+                return $item->count();
             });
     }
 
@@ -37,7 +39,7 @@ trait HasStatistics
                 return $task->completed_at->format('W');
             })
             ->take(10)->map(function ($item, $key) {
-                return $key = $item->count();
+                return $item->count();
             });
     }
 
@@ -50,7 +52,7 @@ trait HasStatistics
                 return $task->created_at->format('W');
             })
             ->take(10)->map(function ($item, $key) {
-                return $key = $item->count();
+                return $item->count();
             });
     }
 }

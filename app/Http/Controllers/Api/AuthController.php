@@ -34,11 +34,13 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+        $request['email'] = $request['username'];
+
         $this->validateRequest($request);
 
         $user = User::create([
             'name'     => $request['name'],
-            'email'    => $request['username'],
+            'email'    => $request['email'],
             'password' => Hash::make($request['password']),
         ]);
 
@@ -57,7 +59,7 @@ class AuthController extends Controller
     {
         return $request->validate([
             'name'     => 'required|string|max:255',
-            'username' => 'required|string|email|max:255|unique:users',
+            'email'    => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
         ]);
     }
