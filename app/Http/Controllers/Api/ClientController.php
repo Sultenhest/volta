@@ -19,8 +19,12 @@ class ClientController extends Controller
     public function index()
     {
         $clients = auth()->user()->clients()->get();
+        $trashed_clients = auth()->user()->clients()->onlyTrashed()->get();
         
-        return new ClientCollection($clients);
+        return response()->json([
+            'clients'         => new ClientCollection($clients),
+            'trashed_clients' => new ClientCollection($trashed_clients)
+        ], 200);
     }
 
     /**

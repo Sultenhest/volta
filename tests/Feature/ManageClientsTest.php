@@ -46,17 +46,19 @@ class ManageClientsTest extends TestCase
         factory(Client::class)->create(['name' => 'other users client 1']);
         $user->clients()->create(['name' => 'client 2']);
         factory(Client::class)->create(['name' => 'other users client 2']);
-        $user->clients()->create(['name' => 'client 3']);
+        $trash = $user->clients()->create(['name' => 'client 3']);
 
         $this->assertCount(3, $user->clients);
         $this->assertCount(5, Client::all());
+
+        $trash->delete();
 
         $response = $this->actingAs($user)->getJson('/api/clients')
             ->assertOk()
             ->assertJsonFragment([
                 'name' => 'client 1',
                 'name' => 'client 2',
-                'name' => 'client 3'
+                'name' => 'client 3',
             ]);
     }
 
