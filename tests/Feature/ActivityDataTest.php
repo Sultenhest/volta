@@ -17,6 +17,18 @@ class ActivityDataTest extends TestCase
         $this->get('/api/activities')->assertRedirect('login');
     }
 
+    public function test_a_user_can_access_their_feed()
+    {
+        $user = $this->apiSignIn();
+
+        $response = $this->actingAs($user)
+            ->getJson('/api/me')
+            ->assertOk()
+            ->assertJsonFragment([
+                'feed' => []
+            ]);
+    }
+
     public function test_a_user_can_get_all_their_activities()
     {
         $user = $this->apiSignIn();
@@ -25,7 +37,8 @@ class ActivityDataTest extends TestCase
         $user->projects()->create(['title' => 'project 2']);
         $user->projects()->create(['title' => 'project 3']);
 
-        $response = $this->actingAs($user)->getJson('/api/activities')
+        $response = $this->actingAs($user)
+            ->getJson('/api/activities')
             ->assertOk()
             ->assertJsonCount(3);
     }
