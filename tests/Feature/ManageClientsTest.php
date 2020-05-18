@@ -239,4 +239,13 @@ class ManageClientsTest extends TestCase
 
         $this->deleteJson($client->path() . '/forcedelete')->assertForbidden();
     }
+
+    public function test_an_authenticated_user_cannot_see_other_clients_activity()
+    {
+        $this->apiSignIn();
+
+        $client = factory(Client::class)->create();
+
+        $this->get($client->path() . '/activity')->assertForbidden();
+    }
 }
