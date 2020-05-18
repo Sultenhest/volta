@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Client;
 use App\Http\Resources\ClientCollection;
+use App\Http\Resources\ActivityCollection;
 use App\Http\Resources\Client as ClientResource;
 
 use App\Http\Controllers\Controller;

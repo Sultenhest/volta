@@ -33,7 +33,8 @@ class ManageClientsTest extends TestCase
 
         $this->assertCount(1, $user->clients);
 
-        $response = $this->actingAs($user)->getJson($user->clients->first()->path())
+        $response = $this->actingAs($user)
+            ->getJson($user->clients->first()->path())
             ->assertOk()
             ->assertJsonFragment(['name' => 'client 1']);
     }

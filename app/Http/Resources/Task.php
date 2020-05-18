@@ -15,8 +15,7 @@ class Task extends JsonResource
     public function toArray($request)
     {
         return parent::toArray($request) + [
-            'description' => $this->description,
-            'activity'    => $this->activity
+            'description' => $this->description
         ];
     }
 }

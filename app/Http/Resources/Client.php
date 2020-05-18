@@ -20,8 +20,7 @@ class Client extends JsonResource
             'vat'         => $this->vat,
             'created_at'  => $this->created_at,
             'updated_at'  => $this->updated_at,
-            'projects'    => $this->projects,
-            'activity'    => $this->activity
+            'projects'    => $this->projects
         ];
     }
 }

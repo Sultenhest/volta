@@ -10,9 +10,17 @@ use Illuminate\Support\Facades\Http;
 
 class AuthController extends Controller
 {
-    public function login()
+    /**
+     * Login the user.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function login(Request $request)
     {
-        $user = User::where('email', request('username'))->first();
+        $request['email'] = $request['username'];
+
+        $user = User::where('email', $request['email'])->first();
 
         abort_unless($user, 404, 'These credentials do not match our records.');
         abort_unless(
@@ -21,7 +29,7 @@ class AuthController extends Controller
             'These credentials do not match our records.'
         );
 
-        $response = $this->grantPasswordToken(request('username'), request('password'));
+        $response = $this->grantPasswordToken($request['email'], $request['password']);
 
         return response($response, 200);
     }
@@ -64,6 +72,9 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Logout the user.
+     */
     public function logout()
     {
         auth()->user()->tokens->each(function ($token, $key) {
@@ -73,6 +84,9 @@ class AuthController extends Controller
         return response(200);
     }
 
+    /**
+     * Grant Password Token.
+     */
     protected function grantPasswordToken(string $username, string $password)
     {
         $params = [
