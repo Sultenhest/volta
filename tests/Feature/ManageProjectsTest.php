@@ -24,6 +24,7 @@ class ManageProjectsTest extends TestCase
         $this->delete($project->path())->assertRedirect('login');
         $this->patch($project->path() . '/restore')->assertRedirect('login');
         $this->delete($project->path() . '/forcedelete')->assertRedirect('login');
+        $this->get($project->path() . '/activity')->assertRedirect('login');
     }
 
     public function test_a_user_can_get_a_single_project()
@@ -238,6 +239,27 @@ class ManageProjectsTest extends TestCase
         ]);
     }
 
+    public function test_a_user_can_see_the_projects_activity()
+    {
+        $user = $this->apiSignIn();
+
+        $project = $user->projects()->create(['title' => 'New Project']);
+        $project->update(['title' => 'New Title']);
+
+        $this->assertCount(2, $project->activity);
+
+        $response = $this->actingAs($user)
+            ->getJson($project->path() . '/activity')
+            ->assertOk()
+            ->assertJsonFragment([
+                'description' => 'created_project',
+                'description' => 'updated_project'
+            ]);
+
+        $this->assertEquals('created_project', $project->activity->first()->description);
+        $this->assertEquals('updated_project', $project->activity->last()->description);
+    }
+
     public function test_an_authenticated_user_cannot_see_projects_of_others()
     {
         $this->apiSignIn();
@@ -285,5 +307,14 @@ class ManageProjectsTest extends TestCase
         $project->delete();
 
         $this->deleteJson($project->path() . '/forcedelete')->assertForbidden();
+    }
+
+    public function test_an_authenticated_user_cannot_see_other_projects_activity()
+    {
+        $this->apiSignIn();
+
+        $project = factory(Project::class)->create();
+
+        $this->get($project->path() . '/activity')->assertForbidden();
     }
 }

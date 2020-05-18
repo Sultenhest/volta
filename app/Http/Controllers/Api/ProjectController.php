@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Project;
 use App\Http\Resources\ProjectCollection;
+use App\Http\Resources\ActivityCollection;
 use App\Http\Resources\Project as ProjectResource;
 
 use App\Http\Controllers\Controller;
@@ -127,6 +128,21 @@ class ProjectController extends Controller
         return response()->json([
             'message' => 'Project was permanently deleted.'
         ], 204);
+    }
+
+    /**
+     * Display the resource activities.
+     *
+     * @param  \App\Client  $client
+     * @return \Illuminate\Http\Response
+     */
+    public function activity(Project $project)
+    {
+        $this->authorize('view', $project);
+
+        $activities = $project->activity()->paginate(20);
+
+        return new ActivityCollection($activities);
     }
 
     /**

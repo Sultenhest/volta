@@ -55,6 +55,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
         Route::delete('/{project}', 'ProjectController@destroy');
         Route::patch('/{project}/restore', 'ProjectController@restore')->name('projects.restore');
         Route::delete('/{project}/forcedelete', 'ProjectController@forceDelete')->name('projects.forcedelete');
+        Route::get('/{project}/activity', 'ProjectController@activity')->name('projects.activity');
 
         //Tasks
         Route::post('/{project}/tasks', 'TaskController@store');
