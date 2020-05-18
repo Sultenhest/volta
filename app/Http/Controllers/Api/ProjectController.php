@@ -133,7 +133,7 @@ class ProjectController extends Controller
     /**
      * Display the resource activities.
      *
-     * @param  \App\Client  $client
+     * @param  \App\Project  $project
      * @return \Illuminate\Http\Response
      */
     public function activity(Project $project)
