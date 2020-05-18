@@ -18,13 +18,16 @@ class Project extends Model
         parent::boot();
 
         static::deleting(function ($project) {
+            $project->tasks()->delete();
+
             if ($project->forceDeleting) {
-                $project->tasks->each( function($task) {
-                    $task->delete();
-                    $task->forceDelete();
-                });
+               $project->tasks()->forceDelete();
             }
         });
+
+        static::restoring( function ($project) {
+            $project->tasks()->withTrashed()->restore();
+        }); 
     }
 
     public function user()

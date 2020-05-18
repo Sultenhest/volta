@@ -130,15 +130,41 @@ class ManageProjectsTest extends TestCase
         $this->assertSoftDeleted('projects', $attributes);
     }
 
+    public function test_soft_deleting_a_project_soft_deletes_its_tasks()
+    {
+        $user = $this->apiSignIn();
+
+        $project_attr = ['title' => 'Project Title'];
+        $task_attr = ['title' => 'Task Title'];
+
+        $project = $user->projects()->create($project_attr);
+
+        $project->addTask($task_attr);
+
+        $response = $this->actingAs($user)
+            ->deleteJson($project->path())
+            ->assertNoContent();
+
+        $this->assertSoftDeleted('projects', $project_attr);
+        $this->assertSoftDeleted('tasks', $task_attr);
+    }
+
     public function test_a_user_can_restore_a_project()
     {
         $user = $this->apiSignIn();
 
         $attributes = ['title' => 'Project Title'];
+        $task_attr  = ['title' => 'Test Task'];
 
         $project = $user->projects()->create($attributes);
+        $task = $project->addTask($task_attr);
 
         $project->delete();
+
+        $this->assertSoftDeleted('projects', $attributes);
+        $this->assertSoftDeleted('tasks', $task_attr);
+
+        $project->refresh();
 
         $response = $this->actingAs($user)
             ->patchJson($project->path() . '/restore')
@@ -148,6 +174,7 @@ class ManageProjectsTest extends TestCase
             ]);
 
         $this->assertDatabaseHas('projects', $attributes);
+        $this->assertDatabaseHas('tasks', $task_attr);
     }
 
     public function test_a_user_can_only_force_delete_a_soft_deleted_project()
@@ -155,9 +182,10 @@ class ManageProjectsTest extends TestCase
         $user = $this->apiSignIn();
 
         $attributes = ['title' => 'Project Title'];
+        $task_attr  = ['title' => 'Test Task'];
 
         $project = $user->projects()->create($attributes);
-        $task = $project->addTask(['title' => 'Test Task']);
+        $project->addTask($task_attr);
 
         $project->delete();
 
@@ -166,7 +194,7 @@ class ManageProjectsTest extends TestCase
             ->assertNoContent();
 
         $this->assertDatabaseMissing('projects', $attributes);
-        $this->assertDatabaseMissing('tasks', ['id' => $task->id]);
+        $this->assertDatabaseMissing('tasks', $task_attr);
         $this->assertDatabaseMissing('activities', [
             'subject_id'   => $project->id,
             'subject_type' => get_class($project)
