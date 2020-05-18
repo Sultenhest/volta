@@ -25,6 +25,7 @@ class ManageTaskTest extends TestCase
         $this->delete($task->path())->assertRedirect('login');
         $this->patch($task->path() . '/restore')->assertRedirect('login');
         $this->delete($task->path() . '/forcedelete')->assertRedirect('login');
+        $this->get($task->path() . '/activity')->assertRedirect('login');
     }
 
     public function test_a_user_can_get_a_single_task()
@@ -311,6 +312,31 @@ class ManageTaskTest extends TestCase
         ]);
     }
 
+    public function test_a_user_can_see_the_tasks_activity()
+    {
+        $user = $this->apiSignIn();
+
+        $project = factory(Project::class)->create([
+            'user_id' => $user->id
+        ]);
+
+        $task = $project->addTask(['title' => 'task 1']);
+        $task->update(['title' => 'New title']);
+
+        $this->assertCount(2, $task->activity);
+
+        $response = $this->actingAs($user)
+            ->getJson($task->path() . '/activity')
+            ->assertOk()
+            ->assertJsonFragment([
+                'description' => 'created_task',
+                'description' => 'updated_task'
+            ]);
+
+        $this->assertEquals('created_task', $task->activity->first()->description);
+        $this->assertEquals('updated_task', $task->activity->last()->description);
+    }
+
     public function test_an_authenticated_user_cannot_see_tasks_of_others()
     {
         $this->apiSignIn();
@@ -358,5 +384,14 @@ class ManageTaskTest extends TestCase
         $task->delete();
 
         $this->deleteJson($task->path() . '/forcedelete')->assertForbidden();
+    }
+
+    public function test_an_authenticated_user_cannot_see_other_tasks_activity()
+    {
+        $this->apiSignIn();
+
+        $task = factory(Task::class)->create();
+
+        $this->get($task->path() . '/activity')->assertForbidden();
     }
 }

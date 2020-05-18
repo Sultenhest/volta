@@ -66,5 +66,6 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
         Route::delete('/{project}/tasks/{task}/forcedelete', 'TaskController@forceDelete')->name('tasks.forcedelete');
         Route::patch('/{project}/tasks/{task}/completed', 'TaskController@completed')->name('tasks.toggleCompleted');
         Route::patch('/{project}/tasks/{task}/billed', 'TaskController@billed')->name('tasks.toggleBilled');
+        Route::get('/{project}/tasks/{task}/activity', 'TaskController@activity')->name('tasks.activity');
     });
 });

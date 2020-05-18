@@ -6,6 +6,7 @@ use App\Task;
 use App\Project;
 use App\Http\Resources\Project as ProjectResource;
 use App\Http\Resources\TaskCollection;
+use App\Http\Resources\ActivityCollection;
 use App\Http\Resources\Task as TaskResource;
 
 use App\Http\Controllers\Controller;
@@ -185,6 +186,22 @@ class TaskController extends Controller
             'task'    => new TaskResource($task),
             'message' => 'Task was successfully marked as ' . $message
         ], 200);
+    }
+
+    /**
+     * Display the resource activities.
+     *
+     * @param  \App\Project  $project
+     * @param  \App\Task  $task
+     * @return \Illuminate\Http\Response
+     */
+    public function activity(Project $project, Task $task) 
+    {
+        $this->authorize('view', $project);
+
+        $activities = $task->activity()->paginate(20);
+
+        return new ActivityCollection($activities);
     }
 
     /**
