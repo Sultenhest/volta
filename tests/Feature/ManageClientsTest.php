@@ -23,6 +23,7 @@ class ManageClientsTest extends TestCase
         $this->delete($client->path())->assertRedirect('login');
         $this->patch($client->path() . '/restore')->assertRedirect('login');
         $this->delete($client->path() . '/forcedelete')->assertRedirect('login');
+        $this->get($client->path() . '/activity')->assertRedirect('login');
     }
 
     public function test_a_user_can_get_a_single_client()
@@ -167,6 +168,27 @@ class ManageClientsTest extends TestCase
             'subject_id'   => $client->id,
             'subject_type' => get_class($client)
         ]);
+    }
+
+    public function test_a_user_can_see_the_clients_activity()
+    {
+        $user = $this->apiSignIn();
+
+        $client = $user->clients()->create(['name' => 'client 1']);
+        $client->update(['name' => 'New Name']);
+
+        $this->assertCount(2, $client->activity);
+
+        $response = $this->actingAs($user)
+            ->getJson($client->path() . '/activity')
+            ->assertOk()
+            ->assertJsonFragment([
+                'description' => 'created_client',
+                'description' => 'updated_client'
+            ]);
+
+        $this->assertEquals('created_client', $client->activity->first()->description);
+        $this->assertEquals('updated_client', $client->activity->last()->description);
     }
 
     public function test_an_authenticated_user_cannot_see_clients_of_others()

@@ -42,6 +42,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {
     Route::delete('/clients/{client}', 'ClientController@destroy');
     Route::patch('/clients/{client}/restore', 'ClientController@restore')->name('clients.restore');
     Route::delete('/clients/{client}/forcedelete', 'ClientController@forceDelete')->name('clients.forcedelete');
+    Route::get('/clients/{client}/activity', 'ClientController@activity')->name('clients.activity');
 
     Route::get('/tasks', 'TaskController@index');
 

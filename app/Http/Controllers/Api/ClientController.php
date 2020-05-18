@@ -129,6 +129,21 @@ class ClientController extends Controller
     }
 
     /**
+     * Display the resource activities.
+     *
+     * @param  \App\Client  $client
+     * @return \Illuminate\Http\Response
+     */
+    public function activity(Client $client)
+    {
+        $this->authorize('view', $client);
+
+        $activities = $client->activity()->paginate(20);
+
+        return new ActivityCollection($activities);
+    }
+
+    /**
      * Validate the request.
      *
      * @param  \Illuminate\Http\Request  $request
