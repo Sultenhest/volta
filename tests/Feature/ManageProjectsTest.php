@@ -72,7 +72,8 @@ class ManageProjectsTest extends TestCase
         $this->assertCount(3, $project->tasks);
         $this->assertCount(1, $user->projects);
 
-        $response = $this->actingAs($user)->getJson($project->path())
+        $response = $this->actingAs($user)
+            ->getJson($project->path())
             ->assertOk()
             ->assertJsonFragment([
                 'title'             => 'project 1',
