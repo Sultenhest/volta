@@ -14,7 +14,7 @@ class ActivityDataTest extends TestCase
 
     public function test_guests_cannot_access_activity()
     {
-        $this->get('/api/activities')->assertRedirect('login');
+        $this->get('/api/activities')->assertForbidden();
     }
 
     public function test_a_user_can_access_their_feed()
