@@ -16,14 +16,46 @@ class ManageClientsTest extends TestCase
     {
         $client = factory(Client::class)->create();
 
-        $this->get('/api/clients')->assertRedirect('login');
-        $this->post('/api/clients', $client->toArray())->assertRedirect('login');
-        $this->get($client->path())->assertRedirect('login');
-        $this->patch($client->path())->assertRedirect('login');
-        $this->delete($client->path())->assertRedirect('login');
-        $this->patch($client->path() . '/restore')->assertRedirect('login');
-        $this->delete($client->path() . '/forcedelete')->assertRedirect('login');
-        $this->get($client->path() . '/activity')->assertRedirect('login');
+        $this->get('/api/clients')
+            ->assertUnauthorized()
+            ->assertExactJson([
+                'error' => 'Unauthenticated. You need to be logged in to access this resource.'
+            ]);
+        $this->post('/api/clients', $client->toArray())
+            ->assertUnauthorized()
+            ->assertExactJson([
+                'error' => 'Unauthenticated. You need to be logged in to access this resource.'
+            ]);
+        $this->get($client->path())
+            ->assertUnauthorized()
+            ->assertExactJson([
+                'error' => 'Unauthenticated. You need to be logged in to access this resource.'
+            ]);
+        $this->patch($client->path())
+            ->assertUnauthorized()
+            ->assertExactJson([
+                'error' => 'Unauthenticated. You need to be logged in to access this resource.'
+            ]);
+        $this->delete($client->path())
+            ->assertUnauthorized()
+            ->assertExactJson([
+                'error' => 'Unauthenticated. You need to be logged in to access this resource.'
+            ]);
+        $this->patch($client->path() . '/restore')
+            ->assertUnauthorized()
+            ->assertExactJson([
+                'error' => 'Unauthenticated. You need to be logged in to access this resource.'
+            ]);
+        $this->delete($client->path() . '/forcedelete')
+            ->assertUnauthorized()
+            ->assertExactJson([
+                'error' => 'Unauthenticated. You need to be logged in to access this resource.'
+            ]);
+        $this->get($client->path() . '/activity')
+            ->assertUnauthorized()
+            ->assertExactJson([
+                'error' => 'Unauthenticated. You need to be logged in to access this resource.'
+            ]);
     }
 
     public function test_a_user_can_get_a_single_client()

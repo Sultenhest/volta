@@ -18,14 +18,46 @@ class ManageTaskTest extends TestCase
     {
         $task = factory(Task::class)->create();
 
-        $this->get('api/tasks')->assertRedirect('login');
-        $this->post($task->project->path() . '/tasks', $task->toArray())->assertRedirect('login');
-        $this->get($task->path())->assertRedirect('login');
-        $this->patch($task->path())->assertRedirect('login');
-        $this->delete($task->path())->assertRedirect('login');
-        $this->patch($task->path() . '/restore')->assertRedirect('login');
-        $this->delete($task->path() . '/forcedelete')->assertRedirect('login');
-        $this->get($task->path() . '/activity')->assertRedirect('login');
+        $this->get('api/tasks')
+            ->assertUnauthorized()
+            ->assertExactJson([
+                'error' => 'Unauthenticated. You need to be logged in to access this resource.'
+            ]);
+        $this->post($task->project->path() . '/tasks', $task->toArray())
+            ->assertUnauthorized()
+            ->assertExactJson([
+                'error' => 'Unauthenticated. You need to be logged in to access this resource.'
+            ]);
+        $this->get($task->path())
+            ->assertUnauthorized()
+            ->assertExactJson([
+                'error' => 'Unauthenticated. You need to be logged in to access this resource.'
+            ]);
+        $this->patch($task->path())
+            ->assertUnauthorized()
+            ->assertExactJson([
+                'error' => 'Unauthenticated. You need to be logged in to access this resource.'
+            ]);
+        $this->delete($task->path())
+            ->assertUnauthorized()
+            ->assertExactJson([
+                'error' => 'Unauthenticated. You need to be logged in to access this resource.'
+            ]);
+        $this->patch($task->path() . '/restore')
+            ->assertUnauthorized()
+            ->assertExactJson([
+                'error' => 'Unauthenticated. You need to be logged in to access this resource.'
+            ]);
+        $this->delete($task->path() . '/forcedelete')
+            ->assertUnauthorized()
+            ->assertExactJson([
+                'error' => 'Unauthenticated. You need to be logged in to access this resource.'
+            ]);
+        $this->get($task->path() . '/activity')
+            ->assertUnauthorized()
+            ->assertExactJson([
+                'error' => 'Unauthenticated. You need to be logged in to access this resource.'
+            ]);
     }
 
     public function test_a_user_can_get_a_single_task()
