@@ -17,12 +17,6 @@ use Illuminate\Support\Facades\Route;
 Route::group(['namespace' => 'Api', 'middleware' => 'guest'], function () {
     Route::post('/login', 'AuthController@login');
     Route::post('/register', 'AuthController@register');
-
-    Route::get('/unauthenticated', function () {
-        return response()->json([
-            'error' => 'Unauthenticated. You need to be logged in to access this resource.'
-        ], 401);
-    })->name('api.unauthenticated');
 });
 
 Route::group(['namespace' => 'Api', 'middleware' => 'auth:api'], function () {

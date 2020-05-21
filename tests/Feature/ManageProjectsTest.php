@@ -18,42 +18,34 @@ class ManageProjectsTest extends TestCase
         $project = factory(Project::class)->create();
 
         $this->getJson('/api/projects')
-            ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
         $this->postJson('/api/projects', $project->toArray())
-            ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
         $this->getJson($project->path())
-            ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
         $this->patchJson($project->path())
-            ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
         $this->deleteJson($project->path())
-            ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
         $this->patchJson($project->path() . '/restore')
-            ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
         $this->deleteJson($project->path() . '/forcedelete')
-            ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
         $this->getJson($project->path() . '/activity')
-            ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);

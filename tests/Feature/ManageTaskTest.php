@@ -19,42 +19,34 @@ class ManageTaskTest extends TestCase
         $task = factory(Task::class)->create();
 
         $this->getJson('api/tasks')
-            ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
         $this->postJson($task->project->path() . '/tasks', $task->toArray())
-            ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
         $this->getJson($task->path())
-            ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
         $this->patchJson($task->path())
-            ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
         $this->deleteJson($task->path())
-            ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
         $this->patchJson($task->path() . '/restore')
-            ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
         $this->deleteJson($task->path() . '/forcedelete')
-            ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
         $this->getJson($task->path() . '/activity')
-            ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
