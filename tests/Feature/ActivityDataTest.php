@@ -14,7 +14,7 @@ class ActivityDataTest extends TestCase
 
     public function test_guests_cannot_access_activity()
     {
-        $this->get('/api/activities')
+        $this->getJson('/api/activities')
             ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'

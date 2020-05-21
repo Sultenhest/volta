@@ -17,14 +17,15 @@ class ManageApiAuthenticationTest extends TestCase
     {
         $this->apiSignIn();
 
-        $response = $this->get('/api/user');
+        $response = $this->getJson('/api/user');
 
         $response->assertStatus(200);
     }
 
     public function an_unauthenticated_user_cannot_access_user_information()
     {
-        $this->get('/api/user')->assertResponseStatus(403);
+        $this->getJson('/api/user')
+            ->assertResponseStatus(403);
     }
 
     public function test_a_user_can_register()
@@ -52,13 +53,19 @@ class ManageApiAuthenticationTest extends TestCase
             ->assertJsonValidationErrors(['email', 'password']);
     }
 
-    // TODO
+    //TODO
     public function a_user_can_log_in()
     {
-        $response = $this->postJson('/api/login', [
-            'username' => $this->faker->email(),
-            'password' => $this->faker->password()
+        $user = factory(User::class)->create([
+            'password' => bcrypt($password = 'password'),
         ]);
+
+        $response = $this->postJson('/api/login', [
+            'email' => $user->email,
+            'password' => $password
+        ]);
+
+        dd($response);
 
         $response->assertStatus(200)
             ->assertJsonStructure([

@@ -15,9 +15,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group(['namespace' => 'Api', 'middleware' => 'guest'], function () {
-    Route::get('/test', function () {
-        return 'Could make request to server';
-    });
    Route::post('/login', 'AuthController@login');
    Route::post('/register', 'AuthController@register'); 
 });

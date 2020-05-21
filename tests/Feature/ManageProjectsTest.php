@@ -17,42 +17,42 @@ class ManageProjectsTest extends TestCase
     {
         $project = factory(Project::class)->create();
 
-        $this->get('/api/projects')
+        $this->getJson('/api/projects')
             ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
-        $this->post('/api/projects', $project->toArray())
+        $this->postJson('/api/projects', $project->toArray())
             ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
-        $this->get($project->path())
+        $this->getJson($project->path())
             ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
-        $this->patch($project->path())
+        $this->patchJson($project->path())
             ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
-        $this->delete($project->path())
+        $this->deleteJson($project->path())
             ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
-        $this->patch($project->path() . '/restore')
+        $this->patchJson($project->path() . '/restore')
             ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
-        $this->delete($project->path() . '/forcedelete')
+        $this->deleteJson($project->path() . '/forcedelete')
             ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
             ]);
-        $this->get($project->path() . '/activity')
+        $this->getJson($project->path() . '/activity')
             ->assertUnauthorized()
             ->assertExactJson([
                 'error' => 'Unauthenticated. You need to be logged in to access this resource.'
@@ -96,7 +96,8 @@ class ManageProjectsTest extends TestCase
         $this->assertCount(3, $user->projects);
         $this->assertCount(5, Project::all());
 
-        $response = $this->actingAs($user)->getJson('/api/projects')
+        $response = $this->actingAs($user)
+            ->getJson('/api/projects')
             ->assertOk()
             ->assertJsonCount(3);
     }
@@ -299,7 +300,7 @@ class ManageProjectsTest extends TestCase
 
         $project = factory(Project::class)->create();
 
-        $this->get($project->path())->assertForbidden();
+        $this->getJson($project->path())->assertForbidden();
     }
 
     public function test_an_authenticated_user_cannot_update_projects_of_others()
@@ -348,6 +349,6 @@ class ManageProjectsTest extends TestCase
 
         $project = factory(Project::class)->create();
 
-        $this->get($project->path() . '/activity')->assertForbidden();
+        $this->getJson($project->path() . '/activity')->assertForbidden();
     }
 }
