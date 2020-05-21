@@ -90,7 +90,7 @@ class ClientController extends Controller
 
         return response()->json([
             'message' => 'Client was successfully trashed.'
-        ], 204);
+        ], 200);
     }
 
     /**
@@ -125,7 +125,7 @@ class ClientController extends Controller
 
         return response()->json([
             'message' => 'Client was permanently deleted.'
-        ], 204);
+        ], 200);
     }
 
     /**

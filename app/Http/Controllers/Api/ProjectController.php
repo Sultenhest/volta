@@ -92,7 +92,7 @@ class ProjectController extends Controller
 
         return response()->json([
             'message' => 'Project was successfully trashed.'
-        ], 204);
+        ], 200);
     }
 
     /**
@@ -127,7 +127,7 @@ class ProjectController extends Controller
 
         return response()->json([
             'message' => 'Project was permanently deleted.'
-        ], 204);
+        ], 200);
     }
 
     /**

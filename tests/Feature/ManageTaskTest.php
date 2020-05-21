@@ -292,7 +292,10 @@ class ManageTaskTest extends TestCase
 
         $response = $this->actingAs($user)
             ->deleteJson($task->path())
-            ->assertNoContent();
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Task was successfully trashed.',
+            ]);
 
         $this->assertSoftDeleted('tasks', $attributes);
     }
@@ -333,7 +336,10 @@ class ManageTaskTest extends TestCase
 
         $this->actingAs($user)
             ->deleteJson($task->path() . '/forcedelete')
-            ->assertNoContent();
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Task was permanently deleted.',
+            ]);
 
         $this->assertDatabaseMissing('tasks', $attributes);
         $this->assertDatabaseMissing('activities', [

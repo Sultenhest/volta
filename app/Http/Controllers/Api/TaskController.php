@@ -96,7 +96,7 @@ class TaskController extends Controller
 
         return response()->json([
             'message' => 'Task was successfully trashed.'
-        ], 204);
+        ], 200);
     }
 
     /**
@@ -135,7 +135,7 @@ class TaskController extends Controller
 
         return response()->json([
             'message' => 'Task was permanently deleted.'
-        ], 204);
+        ], 200);
     }
 
     /**

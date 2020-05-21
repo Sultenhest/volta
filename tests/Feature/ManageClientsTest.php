@@ -157,7 +157,10 @@ class ManageClientsTest extends TestCase
 
         $response = $this->actingAs($user)
             ->deleteJson($client->path())
-            ->assertNoContent();
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Client was successfully trashed.',
+            ]);
 
         $this->assertSoftDeleted('clients', $attributes);
     }
@@ -194,7 +197,10 @@ class ManageClientsTest extends TestCase
 
         $this->actingAs($user)
             ->deleteJson($client->path() . '/forcedelete')
-            ->assertNoContent();
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Client was permanently deleted.',
+            ]);
 
         $this->assertDatabaseMissing('clients', $attributes);
         $this->assertDatabaseMissing('activities', [

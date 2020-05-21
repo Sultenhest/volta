@@ -160,7 +160,10 @@ class ManageProjectsTest extends TestCase
 
         $response = $this->actingAs($user)
             ->deleteJson($project->path())
-            ->assertNoContent();
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Project was successfully trashed.',
+            ]);
 
         $this->assertSoftDeleted('projects', $attributes);
     }
@@ -176,9 +179,11 @@ class ManageProjectsTest extends TestCase
 
         $project->addTask($task_attr);
 
-        $response = $this->actingAs($user)
+        $this->actingAs($user)
             ->deleteJson($project->path())
-            ->assertNoContent();
+            ->assertJson([
+                'message' => 'Project was successfully trashed.',
+            ]);
 
         $this->assertSoftDeleted('projects', $project_attr);
         $this->assertSoftDeleted('tasks', $task_attr);
@@ -226,7 +231,10 @@ class ManageProjectsTest extends TestCase
 
         $this->actingAs($user)
             ->deleteJson($project->path() . '/forcedelete')
-            ->assertNoContent();
+            ->assertOk()
+            ->assertJson([
+                'message' => 'Project was permanently deleted.',
+            ]);
 
         $this->assertDatabaseMissing('projects', $attributes);
         $this->assertDatabaseMissing('tasks', $task_attr);
