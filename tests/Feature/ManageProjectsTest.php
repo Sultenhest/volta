@@ -102,6 +102,32 @@ class ManageProjectsTest extends TestCase
             ->assertJsonCount(3);
     }
 
+    public function test_a_user_can_get_a_clients_projects()
+    {        
+        $user = $this->apiSignIn();
+
+        $client = factory(Client::class)->create([
+            'user_id' => $user->id
+        ]);
+
+        $user->projects()->create(['title' => 'project 1', 'client_id' => $client->id]);
+        factory(Project::class)->create(['title' => 'other 1']);
+        $user->projects()->create(['title' => 'project 2', 'client_id' => $client->id]);
+        factory(Project::class)->create(['title' => 'other 2']);
+        $user->projects()->create(['title' => 'project 3', 'client_id' => $client->id]);
+
+        $this->assertCount(3, $client->projects);
+
+        $response = $this->actingAs($user)
+            ->getJson($client->path() . '/projects')
+            ->assertOk()
+            ->assertJsonFragment([
+                'title' => 'project 1',
+                'title' => 'project 2',
+                'title' => 'project 3'
+            ]);
+    }
+
     public function test_a_project_requires_a_title()
     {
         $this->apiSignIn();

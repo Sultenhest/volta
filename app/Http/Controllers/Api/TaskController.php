@@ -18,6 +18,7 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  \App\Project  $project
      * @return \Illuminate\Http\Response
      */
     public function index(Project $project = null)
@@ -25,8 +26,10 @@ class TaskController extends Controller
         if( is_null( $project ) ) {
             $tasks = auth()->user()->tasks()->paginate(10);
         } else {
+            $this->authorize('view', $project);
             $tasks = $project->tasks;
         }
+        
         return new TaskCollection($tasks);
     }
 

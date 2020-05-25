@@ -106,7 +106,9 @@ class ManageTaskTest extends TestCase
         $project = $user->projects()->create(['title' => 'project 1']);
 
         $project->addTask(['title' => 'task 1']);
+        factory(Task::class)->create(['title' => 'other 1']);
         $project->addTask(['title' => 'task 2']);
+        factory(Task::class)->create(['title' => 'other 2']);
         $project->addTask(['title' => 'task 3']);
 
         $this->assertCount(3, $user->tasks);

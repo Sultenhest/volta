@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Client;
 use App\Project;
 use App\Http\Resources\ProjectCollection;
 use App\Http\Resources\ActivityCollection;
@@ -17,12 +18,18 @@ class ProjectController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  \App\Client  $client
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Client $client = null)
     {
-        $projects = auth()->user()->projects()->paginate(10);
-        
+        if( is_null( $client ) ) {
+            $projects = auth()->user()->projects()->paginate(10);
+        } else {
+            $this->authorize('view', $client);
+            $projects = $client->projects;
+        }
+
         return new ProjectCollection($projects);
     }
 
