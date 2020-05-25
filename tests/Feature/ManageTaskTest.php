@@ -89,7 +89,7 @@ class ManageTaskTest extends TestCase
 
         $project->addTask(['title' => 'task 1']);
         $project->addTask(['title' => 'task 2']);
-        $project->addTask(['title' => 'task 2']);
+        $project->addTask(['title' => 'task 3']);
 
         $this->assertCount(3, $user->tasks);
 
@@ -97,6 +97,28 @@ class ManageTaskTest extends TestCase
             ->getJson('/api/tasks')
             ->assertOk()
             ->assertJsonCount(3);
+    }
+
+    public function test_a_user_can_get_a_projects_tasks()
+    {        
+        $user = $this->apiSignIn();
+
+        $project = $user->projects()->create(['title' => 'project 1']);
+
+        $project->addTask(['title' => 'task 1']);
+        $project->addTask(['title' => 'task 2']);
+        $project->addTask(['title' => 'task 3']);
+
+        $this->assertCount(3, $user->tasks);
+
+        $response = $this->actingAs($user)
+            ->getJson($project->path() . '/tasks')
+            ->assertOk()
+            ->assertJsonFragment([
+                'title' => 'task 1',
+                'title' => 'task 2',
+                'title' => 'task 3'
+            ]);
     }
 
     public function test_a_task_requires_a_title()

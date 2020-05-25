@@ -20,10 +20,13 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Project $project = null)
     {   
-        $tasks = auth()->user()->tasks()->paginate(10);
-        
+        if( is_null( $project ) ) {
+            $tasks = auth()->user()->tasks()->paginate(10);
+        } else {
+            $tasks = $project->tasks;
+        }
         return new TaskCollection($tasks);
     }
 
