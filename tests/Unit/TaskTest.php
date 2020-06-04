@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\User;
 use App\Task;
 use App\Project;
 
@@ -20,6 +21,13 @@ class TaskTest extends TestCase
         $task = factory(Task::class)->create();
         
         $this->assertInstanceOf(Project::class, $task->project);
+    }
+
+    public function test_a_task_belongs_to_a_user()
+    {
+        $task = factory(Task::class)->create();
+        
+        $this->assertInstanceOf(User::class, $task->user);
     }
 
     public function test_a_task_has_a_path()

@@ -199,16 +199,15 @@ class ManageTaskTest extends TestCase
 
         $project = $user->projects()->create(['title' => 'Project Title']);
 
-        $response = $this->postJson($project->path() . '/tasks/',
-            $attributes = [
-                'title' => $this->faker->sentence()
-            ])
+        $task_attr = ['title' => $this->faker->sentence()];
+
+        $this->postJson($project->path() . '/tasks/', $task_attr)
             ->assertCreated()
             ->assertJson([
                 'message' => 'Task was successfully created.',
             ]);
 
-        $this->assertDatabaseHas('tasks', $attributes);
+        $this->assertDatabaseHas('tasks', $task_attr);
     }
 
     public function test_a_user_cannot_add_tasks_to_another_users_project()

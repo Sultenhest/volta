@@ -165,8 +165,8 @@ class ProjectController extends Controller
                 Rule::in(auth()->user()->clients()->pluck('id')),
                 'nullable'
             ],
-            'title'       => 'required',
-            'description' => 'nullable',
+            'title'       => 'required|max:255',
+            'description' => 'nullable|max:5000',
         ]);
     }
 }

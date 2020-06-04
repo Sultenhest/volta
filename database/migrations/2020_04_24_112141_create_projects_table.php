@@ -21,8 +21,8 @@ class CreateProjectsTable extends Migration
                 ->references('id')
                 ->on('clients')
                 ->onDelete('set null');
-            $table->string('title');
-            $table->text('description')->nullable();
+            $table->string('title', 255);
+            $table->text('description', 5000)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

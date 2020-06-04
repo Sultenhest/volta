@@ -152,8 +152,8 @@ class ClientController extends Controller
     protected function validateRequest(Request $request)
     {
         return $request->validate([
-            'name'        => 'sometimes|required',
-            'description' => 'nullable',
+            'name'        => 'sometimes|required|max:500',
+            'description' => 'nullable|max:5000',
             'vat_abbr'    => 'string|max:2|nullable',
             'vat'         => 'numeric|nullable'
         ]);

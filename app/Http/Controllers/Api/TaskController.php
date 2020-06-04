@@ -223,8 +223,8 @@ class TaskController extends Controller
                 'sometimes',
                 Rule::in(auth()->user()->projects()->pluck('id'))
             ],
-            'title'         => 'required',
-            'description'   => 'nullable',
+            'title'         => 'required|max:255',
+            'description'   => 'nullable|max:5000',
             'hours_spent'   => 'nullable|sometimes|integer|min:0',
             'minutes_spent' => 'nullable|sometimes|integer|min:0|max:59'
         ]);

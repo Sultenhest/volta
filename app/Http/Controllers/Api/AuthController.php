@@ -22,7 +22,7 @@ class AuthController extends Controller
 
         $user = User::where('email', $request['email'])->first();
 
-        abort_unless($user, 404, 'These credentials do not match our records.');
+        abort_unless($user, 404, 'User doesnt exist.');
         abort_unless(
             \Hash::check(request('password'), $user->password),
             403,
@@ -90,12 +90,12 @@ class AuthController extends Controller
     protected function grantPasswordToken(string $username, string $password)
     {
         $params = [
-            'grant_type' => 'password',
-            'client_id' => config('services.passport.client_id'),
+            'grant_type'    => 'password',
+            'client_id'     => config('services.passport.client_id'),
             'client_secret' => config('services.passport.client_secret'),
-            'username' => $username,
-            'password' => $password,
-            'scope' => '',
+            'username'      => $username,
+            'password'      => $password,
+            'scope'         => '',
         ];
 
         $response = Http::post(config('services.passport.login_endpoint'), $params);

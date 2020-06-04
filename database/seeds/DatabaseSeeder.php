@@ -18,7 +18,9 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $faker = Faker::create();
-        $user = factory(User::class)->create();
+        $user = factory(User::class)->create([
+            'email' => 'tesla@tesla.dk'
+        ]);
 
         $clients = [];
 
